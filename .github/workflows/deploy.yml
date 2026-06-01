@@ -1,0 +1,183 @@
+name: Build and Push to GHCR
+
+# 只支持推送新 Tag 时触发
+on:
+  push:
+    tags:
+      - "v*" # 匹配 v1.0, v2.1.3 等标签
+
+env:
+  COMMIT_ID: "78dd21dbfdd402b9550aed075ad47c20439319e1"
+  AMULE_ARCHIVE: "https://github.com/amule-project/amule/archive"
+  REGISTRY: ghcr.io
+  # 镜像名称转为小写，避免因为大小写问题导致推送失败
+  IMAGE_NAME: "amule-m26"
+  ARTIFACT_NAME: "template-m26"
+
+jobs:
+  build-frontend:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      # 1. 检出代码
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      # 2. 设置 Node.js 环境 (v24)
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: "24"
+          cache: "npm"
+
+      # 3. 编译前端项目
+      - name: Build Frontend
+        run: |
+          npm ci
+          npm run build
+
+      # 将 dist 目录上传为 Artifact
+      - name: Upload m26-template
+        uses: actions/upload-artifact@v7
+        with:
+          name: ${{ env.ARTIFACT_NAME }}
+          path: dist/
+          retention-days: 1 # 设置保留天数（临时文件 1 天足够）
+
+      - name: Create assets
+        run: |
+          mkdir assets
+          (cd "dist/" && zip -r "../assets/template-m26.zip" .)
+          (cd "docker/tmp/" && zip "../../assets/patch-m26.zip" m26.patch)
+          curl -L "${AMULE_ARCHIVE}/${COMMIT_ID}.zip" -o ./assets/amule-src.zip
+
+      - name: Create Release and Upload Asset
+        uses: softprops/action-gh-release@v3
+        with:
+          body: |
+            [updates](https://github.com/jjling2011/amule-m26/blob/main/docs/updates.md)  
+            [docker images](https://github.com/jjling2011/amule-m26/pkgs/container/amule-m26)  
+            amule-src.zip `commit ${{ env.COMMIT_ID }}`
+          files: assets/*.zip
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  build-docker:
+    needs: build-frontend
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    strategy:
+      matrix:
+        include:
+          - platform: linux/amd64
+            arch: amd64
+          - platform: linux/arm/v6
+            arch: armv6
+          - platform: linux/arm/v7
+            arch: armv7
+          - platform: linux/arm64/v8
+            arch: arm64v8
+          - platform: linux/ppc64le
+            arch: ppc64le
+          - platform: linux/riscv64
+            arch: riscv64
+          - platform: linux/s390x
+            arch: s390x
+    steps:
+      # 1. 检出代码
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      # 下载 Job 1 上传的 dist 目录
+      - name: Download dist artifact
+        uses: actions/download-artifact@v8
+        with:
+          name: ${{ env.ARTIFACT_NAME }}
+          path: dist # 恢复到当前工作目录下的 dist 文件夹
+
+      # 创建目标目录并下载 zip 包（供 Dockerfile 内部使用）
+      - name: Download source for Docker Build
+        run: |
+          curl -L "${AMULE_ARCHIVE}/${COMMIT_ID}.zip" -o /tmp/amule-proj.zip
+          unzip /tmp/amule-proj.zip -d /tmp/
+          (cd "/tmp/amule-${COMMIT_ID}/" && zip -r "/tmp/amule-src.zip" .)
+          mv /tmp/amule-src.zip ./docker/tmp/
+
+      # 4. 设置 QEMU (用于支持 arm64 和 armv7 的跨平台编译)
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v4
+
+      # 4. 设置 Docker Buildx (用于更高效的构建)
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v4
+
+      # 5. 登录到 GitHub Container Registry (GHCR)
+      - name: Log in to GHCR
+        uses: docker/login-action@v4
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      # 关键点：将构建好的镜像以“单平台+后缀”的形式先推送到仓库
+      - name: Build and push by platform
+        id: build
+        uses: docker/build-push-action@v7
+        with:
+          context: .
+          file: ./docker/Dockerfile.release
+          platforms: ${{ matrix.platform }}
+          # 临时推送到带后缀的 tag，如 ghcr.io/user/repo:main-amd64
+          tags: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.ref_name }}-${{ matrix.arch }}
+          push: true
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+  # === 第二阶段：等待所有平台构建完毕，融合成一个 Manifest ===
+  merge-manifests:
+    needs: build-docker # 必须等待第一阶段并行结束
+    runs-on: ubuntu-latest
+    permissions:
+      packages: write
+
+    steps:
+      - name: Log in to GHCR
+        uses: docker/login-action@v4
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      # 提取标准的 tags（比如 latest, v1.0.0 等）
+      - name: Extract metadata
+        id: meta
+        uses: docker/metadata-action@v6
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+          tags: |
+            type=ref,event=branch
+            latest
+
+      # 创建并推送 Manifest List
+      - name: Create and push manifest list
+        run: |
+          # 1. 定义最终要生成的正式 Tag（比如 latest）
+          FINAL_TAG="${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.ref_name }}"
+
+          # 2. 定义第一阶段编好的临时单平台镜像
+          AMD64_IMAGE="${FINAL_TAG}-amd64"
+          ARM_V6_IMAGE="${FINAL_TAG}-armv6"
+          ARM_V7_IMAGE="${FINAL_TAG}-armv7"
+          ARM64_V8_IMAGE="${FINAL_TAG}-arm64v8"
+          PPC64_LE_IMAGE="${FINAL_TAG}-ppc64le"
+          S390X_IMAGE="${FINAL_TAG}-s390x"
+
+          # 3. 创建 Manifest 列表，把两个独立的镜像关联在一起
+          docker buildx imagetools create -t $FINAL_TAG $AMD64_IMAGE $ARM_V6_IMAGE $ARM_V7_IMAGE $ARM64_V8_IMAGE $PPC64_LE_IMAGE $S390X_IMAGE
+
+          # 如果有 latest tag，顺便把 latest 也关联上
+          LATEST_TAG="${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest"
+          docker buildx imagetools create -t $LATEST_TAG $AMD64_IMAGE $ARM_V6_IMAGE $ARM_V7_IMAGE $ARM64_V8_IMAGE $PPC64_LE_IMAGE $S390X_IMAGE

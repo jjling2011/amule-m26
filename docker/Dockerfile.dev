@@ -1,0 +1,47 @@
+FROM amule-builder:v0.0.1 AS builder
+
+WORKDIR /home/amule
+
+COPY debug/wrk/amule-src/ /home/amule/amule-src/
+COPY debug/wrk/amule-build/ /home/amule/amule-build/
+
+RUN cmake --install amule-build && \
+    strip -s /usr/bin/alcc /usr/bin/amulecmd /usr/bin/amuled /usr/bin/amuleweb /usr/bin/ed2k && \
+    gzip /usr/share/man/man1/alcc.1 /usr/share/man/man1/amulecmd.1 /usr/share/man/man1/amuled.1 \
+        /usr/share/man/man1/amuleweb.1 /usr/share/man/man1/ed2k.1 && \
+    rm -rf /tmp/*
+
+FROM amule-runtime:v0.0.1
+
+# thanks to ngosang@hotmail.es
+
+# Copy binaries, Web UI and man docs
+COPY --from=builder /usr/bin/alcc /usr/bin/amulecmd /usr/bin/amuled /usr/bin/amuleweb /usr/bin/ed2k /usr/bin/
+COPY --from=builder /usr/share/amule /usr/share/amule
+COPY --from=builder /usr/share/man/man1/alcc.1.gz /usr/share/man/man1/amulecmd.1.gz \
+    /usr/share/man/man1/amuled.1.gz /usr/share/man/man1/amuleweb.1.gz /usr/share/man/man1/ed2k.1.gz \
+    /usr/share/man/man1/
+
+# Install runtime dependencies and remove unnecessary locale files
+RUN rm -rf /usr/share/locale && \
+    # Check binaries are OK
+    ldd /usr/bin/alcc > /dev/null && \
+    ldd /usr/bin/amulecmd > /dev/null && \
+    ldd /usr/bin/amuled > /dev/null && \
+    ldd /usr/bin/amuleweb > /dev/null && \
+    ldd /usr/bin/ed2k > /dev/null && \
+    # Check man documentation is OK
+    man alcc > /dev/null && \
+    man amulecmd > /dev/null && \
+    man amuled > /dev/null && \
+    man amuleweb > /dev/null && \
+    man ed2k > /dev/null
+
+# Add entrypoint and S6 services
+COPY --chmod=755 docker/rootfs/ /
+
+WORKDIR /home/amule
+
+EXPOSE 4711/tcp 4712/tcp 4662/tcp 4665/udp 4672/udp
+
+ENTRYPOINT ["/home/amule/entrypoint.sh"]

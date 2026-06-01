@@ -1,0 +1,11 @@
+FROM alpine:3.23
+
+# https://mirrors.tuna.tsinghua.edu.cn/
+COPY docker/repositories /etc/apk/
+
+# Install runtime dependencies and remove unnecessary locale files
+RUN apk add --no-cache \
+        crypto++ readline libgcc libstdc++ libmaxminddb libupnp libpng wxwidgets tzdata pwgen curl mandoc \
+        s6 execline su-exec
+
+CMD ["/bin/bash"]

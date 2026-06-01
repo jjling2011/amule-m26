@@ -1,0 +1,392 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>M26 Debug</title>
+        <script src="jquery-3.7.1.min.js"></script>
+        <style type="text/css">
+            * {
+                padding: 0;
+                margin: 0;
+                margin-right: 0.5rem;
+            }
+
+            html,
+            body {
+                margin: auto;
+                width: 96vw;
+                height: 96vh;
+                /* border: 1px solid black; */
+            }
+
+            .main-div {
+                width: 100%;
+                height: 100%;
+                display: flex;
+                /* border: 1px solid black; */
+                flex-direction: row;
+            }
+
+            .panel-left {
+                padding: 0.5rem;
+                /* background-color: red; */
+                width: 40rem;
+                height: 100%;
+                display: flex;
+                flex-direction: column;
+            }
+            .panel-right {
+                padding: 0.5rem;
+                margin-left: 0.5rem;
+                /* background-color: green; */
+                flex-grow: 1;
+                height: 100%;
+                display: flex;
+                flex-direction: column;
+            }
+
+            .output {
+                width: 98%;
+                flex-grow: 1;
+            }
+
+            .row {
+                display: flex;
+                width: 100%;
+                padding: 0.5rem;
+                border-radius: 0.5rem;
+                border: 1px solid gray;
+                margin-bottom: 0.5rem;
+            }
+
+            .custom-param {
+                height: 20rem;
+                width: 97%;
+            }
+
+            textarea {
+                padding: 0.5rem;
+            }
+
+            .max-w {
+                width: 100%;
+                display: flex;
+                margin-bottom: 0.5rem;
+            }
+
+            .flex-col {
+                flex-direction: column;
+            }
+
+            .flex-row {
+                flex-direction: row;
+            }
+
+            .inline {
+                display: inline-block;
+            }
+
+            .grow {
+                flex-grow: 1;
+            }
+
+            .ajax-method {
+                height: 1.7rem;
+                width: 4rem;
+                margin-right: 0.5rem;
+            }
+
+            button {
+                white-space: nowrap;
+                padding: 0.25rem 1rem;
+                margin-right: 0.5rem;
+                margin-bottom: 0.5rem;
+            }
+
+            #input-login-passwd {
+                height: 1rem;
+                width: 10rem;
+                padding: 0.25rem 0.5rem;
+            }
+
+            .max-h {
+                height: 100%;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="main-div">
+            <div class="panel-left">
+                <div class="row flex-col grow">
+                    <div class="max-w flex-row">
+                        <span class="grow inline">GET Params:</span>
+                        <select class="ajax-method" id="ajax-method">
+                            <option value="GET" selected>GET</option>
+                            <option value="POST">POST</option>
+                        </select>
+                        <button class="inline" id="send-get-req">Send</button>
+                    </div>
+                    <textarea
+                        class="custom-param grow"
+                        id="custom-param"
+                        spellcheck="false"
+                    ></textarea>
+                </div>
+                <div class="row" style="flex-wrap: wrap">
+                    <button id="cmd-echo">Hello</button>
+                    <button id="cmd-test">Test</button>
+                    <button id="cmd-get-stats">Stats</button>
+                    <button id="cmd-get-tasks">Download</button>
+                    <button id="cmd-get-servs">Servers</button>
+                    <button id="cmd-do-search">Manual Search</button>
+                    <button id="cmd-get-search-result">Search Res</button>
+                    <button id="cmd-get-search-hashes">Search Hash</button>
+                    <button id="cmd-get-prefs">Get Prefs.</button>
+                    <button id="cmd-get-stats-tree">Stats Tree</button>
+                </div>
+                <div class="row">
+                    <button id="btn-login">Login</button>
+                    <input id="input-login-passwd" type="password" />
+                    <select class="ajax-method" id="login-ajax-method">
+                        <option value="GET" selected>GET</option>
+                        <option value="POST">POST</option>
+                    </select>
+                </div>
+            </div>
+            <div class="panel-right">
+                <div class="row max-h flex-col">
+                    <span class="max-w">Result:</span>
+                    <textarea
+                        class="output"
+                        id="output"
+                        spellcheck="false"
+                    ></textarea>
+                </div>
+            </div>
+        </div>
+        <script>
+            const servUrl = "./serv.php"
+            const btnSend = $("#send-get-req")
+            const tboxOutput = $("#output")
+            const tboxParams = $("#custom-param")
+
+            $(function () {
+                initUI()
+                $("#cmd-echo").trigger("click")
+            })
+
+            async function sendLoginReq() {
+                const pwd = $("#input-login-passwd").val()
+                const method = $("#login-ajax-method option:selected").text()
+                try {
+                    const r = await myAjaxCore(
+                        method,
+                        { pass: pwd },
+                        8000,
+                        "./login.php",
+                    )
+                    tboxOutput.val(r)
+                } catch (err) {
+                    warn(err)
+                }
+            }
+
+            function initUI() {
+                fixTabKey(tboxParams)
+
+                $("#cmd-get-stats-tree").click(function () {
+                    myfetch({ cmd: "GetStatsTree" })
+                })
+
+                $("#cmd-get-prefs").click(function () {
+                    myfetch({ cmd: "GetPrefs" })
+                })
+
+                $("#input-login-passwd").on("keydown", function (e) {
+                    if (e.which === 13) {
+                        sendLoginReq()
+                    }
+                })
+
+                $("#btn-login").click(function () {
+                    sendLoginReq()
+                })
+
+                $("#cmd-echo").click(function () {
+                    myfetch({ cmd: "Echo", msg: "hello!" })
+                })
+
+                $("#cmd-test").click(function () {
+                    myfetch({ cmd: "Test", msg: "hello!" })
+                })
+
+                $("#cmd-do-search").click(function () {
+                    tboxOutput.val(`please click "Send" button`)
+                    tboxParams.val(
+                        format({
+                            cmd: "DoSearch",
+                            keyword: "hello world",
+                            stype: "kad",
+                        }),
+                    )
+                })
+
+                $("#cmd-get-search-hashes").click(function () {
+                    myfetch({ cmd: "GetSearchHash" })
+                })
+
+                $("#cmd-get-search-result").click(function () {
+                    myfetch({ cmd: "GetSearchResult" })
+                })
+
+                $("#cmd-get-tasks").click(function () {
+                    myfetch({ cmd: "GetTasks" })
+                })
+
+                $("#cmd-get-stats").click(function () {
+                    myfetch({ cmd: "GetStats" })
+                })
+
+                $("#cmd-get-servs").click(function () {
+                    myfetch({ cmd: "GetServers" })
+                })
+
+                btnSend.click(function () {
+                    try {
+                        const data = tboxParams.val()
+                        myfetch(JSON.parse(data))
+                    } catch (err) {
+                        warn(err)
+                    }
+                })
+            }
+
+            function warn(err) {
+                log(err)
+                alert(err.message)
+            }
+
+            function log(...args) {
+                console.log(...args)
+            }
+
+            function format(o, indent) {
+                indent = indent || "    "
+                return JSON.stringify(o, null, indent)
+            }
+
+            function fixTabKey(textarea) {
+                textarea.on("keydown", function (e) {
+                    if (e.keyCode === 9) {
+                        // Tab key code
+                        e.preventDefault() // Stop focus change
+
+                        var start = this.selectionStart
+                        var end = this.selectionEnd
+                        var value = $(this).val()
+
+                        // Insert the tab character
+                        $(this).val(
+                            value.substring(0, start) +
+                                "    " +
+                                value.substring(end),
+                        )
+
+                        // Move cursor back to the correct spot
+                        this.selectionStart = this.selectionEnd = start + 1
+                    }
+                })
+            }
+
+            async function myfetch(data, timeout) {
+                try {
+                    tboxParams.val(format(data))
+                    const method = $("#ajax-method option:selected").text()
+                    tboxOutput.val(`Sending [${method}] request...`)
+                    log(`ajax: ${method}, data: ${format(data)}`)
+                    const r = await myAjaxCore(method, data)
+                    log(`result: ${r.substring(0, 100)}`)
+                    try {
+                        const pretty = format(JSON.parse(r))
+                        tboxOutput.val(pretty)
+                    } catch {
+                        tboxOutput.val(r)
+                    }
+                } catch (err) {
+                    warn(err)
+                }
+            }
+
+            function myAjaxCore(method, data, timeout, url) {
+                url = url || servUrl
+                method = method || "POST" // "GET" or "POST"
+                timeout = timeout || 8000
+                data = data || {}
+
+                log(`send ${method} to ${url}`)
+
+                return new Promise((resolve, reject) => {
+                    $.ajax({
+                        url: url,
+                        type: method,
+                        data: data,
+                        timeout: timeout,
+                        success: resolve,
+                        error: function (xhr, status, error) {
+                            if (status === "timeout") {
+                                reject(new Error("request timeout"))
+                            } else {
+                                reject(
+                                    new Error(
+                                        `request failed with error code: ${status}, message: ${error.message}`,
+                                    ),
+                                )
+                            }
+                        },
+                    })
+                })
+            }
+
+            async function myfetchGet(data, timeout) {
+                try {
+                    tboxOutput.val("Sending GET request...")
+                    log(`myfetch: ${format(data)}`)
+                    const r = await fetchCore(data)
+                    log(`result: ${r}`)
+                    try {
+                        const pretty = format(JSON.parse(r))
+                        tboxOutput.val(pretty)
+                    } catch {
+                        tboxOutput.val(r)
+                    }
+                } catch (err) {
+                    warn(err)
+                }
+            }
+
+            async function fetchCore(data, timeout) {
+                timeout = timeout || 8000
+                data = data || {}
+                // 1. 处理 URL 和查询参数 (data)
+                // 使用 URL 对象解析基础链接，方便后续拼接
+                const urlObj = new URL(servUrl, window.location.origin)
+                // 使用 URLSearchParams 自动处理 URI encoding（如空格转为%20，中文转义等）
+                const params = new URLSearchParams(data)
+                urlObj.search = params.toString()
+                const finalUrl = urlObj.toString()
+                // log(`myfetch: ${finalUrl}`)
+
+                // 2. 发起 fetch 请求并获取文本结果
+                const response = await fetch(finalUrl, {
+                    method: "GET",
+                    signal: AbortSignal.timeout(timeout),
+                })
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`)
+                }
+                return response.text() // 按需求以文本类型返回
+            }
+        </script>
+    </body>
+</html>

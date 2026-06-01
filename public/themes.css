@@ -1,0 +1,149 @@
+/* light mode */
+:root {
+    --bg-color: #f0e7de;
+    --fg-color: black;
+    --dlg-mask: rgba(125, 125, 125, 0.7);
+    --btn-color: rgb(241 226 201);
+    --btn-hover: var(--bg-color);
+
+    --sidebar-bg-color: #2c3e50;
+    --sidebar-fg-color: ivory;
+    --sidebar-route-exact: #54679c;
+    --sidebar-route-hover: #6a769f;
+
+    --table-header-color: rgb(212 189 147);
+    --table-row-even: rgb(228 220 207);
+
+    --prefs-cat: rgb(169 165 159);
+    --prefs-row: #e6dfd2;
+}
+
+/* dark mode */
+[data-theme="dark"] {
+    --bg-color: #17232f;
+    --fg-color: whitesmoke;
+    --btn-color: rgb(82 102 143);
+    --btn-hover: rgb(123 142 180);
+
+    --sidebar-bg-color: #2c3e50;
+    --sidebar-fg-color: ivory;
+    --sidebar-route-exact: #54679c;
+    --sidebar-route-hover: #6a769f;
+
+    --table-header-color: rgb(77 102 152);
+    --table-row-even: rgb(36 48 71);
+
+    --prefs-cat: rgb(56 81 124);
+    --prefs-row: rgb(29 41 59);
+}
+
+* {
+    /* background-color: var(--bg-color); */
+    color: var(--fg-color);
+}
+
+/* 4. 页面中使用 CSS 变量 */
+body {
+    background-color: var(--sidebar-bg-color);
+    color: var(--fg-color);
+    transition: all 0.3s ease; /* 增加平滑过渡效果 */
+}
+
+input,
+select,
+select option {
+    color: black;
+}
+
+button {
+    border: 1px solid gray;
+    background-color: var(--btn-color);
+    color: var(--fg-color);
+    padding: 0.125rem 0.5rem;
+    margin-right: 0.5rem;
+    margin-top: 0.125rem;
+    margin-bottom: 0.125rem;
+    border-radius: 0.25rem;
+    cursor: pointer;
+}
+
+button:hover {
+    background-color: var(--btn-hover);
+}
+
+button:disabled {
+    color: gray;
+    background-color: lightgray;
+    cursor: not-allowed;
+    border: 1px solid darkgray;
+}
+
+button:disabled i {
+    color: gray;
+}
+
+.toolbar {
+    position: fixed;
+    left: 14rem;
+    right: 0;
+    top: 0;
+    z-index: 100;
+    height: 3.5rem;
+    background-color: var(--sidebar-bg-color);
+}
+
+.toolstrip {
+    display: flex;
+    align-items: center;
+    height: 3.4rem;
+    padding-left: 0.5rem;
+}
+
+.toolstrip * {
+    margin: 0;
+    margin-right: 0.125rem;
+    border-radius: 0.3rem;
+}
+
+.toolstrip i,
+.toolstrip span {
+    font-size: 1rem;
+    margin-right: 0.5rem;
+    color: var(--sidebar-fg-color);
+}
+
+.toolstrip select {
+    height: 1.8rem;
+    width: 5rem;
+}
+
+.toolstrip button {
+    height: 1.8rem;
+}
+
+.toolstrip input {
+    height: 1.7rem;
+    width: 10rem;
+    padding-left: 0.5rem;
+}
+
+.table-header {
+    position: fixed;
+    left: 14rem;
+    right: 0;
+    top: 3.5rem;
+    z-index: 300;
+    height: 1.5rem;
+    display: flex;
+    border-top-left-radius: 0.5rem;
+    background-color: var(--table-header-color);
+    font-size: 0.85rem;
+}
+
+.table-header span {
+    text-align: center;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 0.125rem;
+}

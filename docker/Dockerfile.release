@@ -1,0 +1,82 @@
+FROM alpine:3.23 AS builder
+
+WORKDIR /tmp
+
+# amule v3-dev source code and patch
+COPY docker/tmp/ /tmp/
+
+# https://mirrors.tuna.tsinghua.edu.cn/
+# COPY docker/repositories /etc/apk/
+
+# Install build tools
+RUN apk add --no-cache \
+        gcc g++ cmake make git unzip patch \
+        boost-dev crypto++-dev libmaxminddb-dev libupnp-dev readline-dev wxwidgets-dev zlib-dev
+
+RUN mkdir /tmp/amule-src && \
+    unzip /tmp/amule-src.zip -d /tmp/amule-src/ && \
+    cd /tmp/amule-src/ && \
+    patch --dry-run -p1 < /tmp/m26.patch && \
+    patch -p1 < /tmp/m26.patch && \
+    cd /tmp && \
+    cmake -B amule-build amule-src \
+        -DCMAKE_INSTALL_PREFIX=/usr \
+        -DCMAKE_BUILD_TYPE=Release \
+        -DBUILD_MONOLITHIC=NO \
+        -DBUILD_DAEMON=YES \
+        -DBUILD_AMULECMD=YES \
+        -DBUILD_WEBSERVER=YES \
+        -DBUILD_ALCC=YES \
+        -DENABLE_IP2COUNTRY=YES \
+        -DENABLE_UPNP=YES \
+        -DENABLE_NLS=NO && \
+    cmake --build amule-build -j"$(nproc)" && \
+    cmake --install amule-build && \
+    strip -s /usr/bin/alcc /usr/bin/amulecmd /usr/bin/amuled /usr/bin/amuleweb /usr/bin/ed2k && \
+    gzip /usr/share/man/man1/alcc.1 /usr/share/man/man1/amulecmd.1 /usr/share/man/man1/amuled.1 \
+        /usr/share/man/man1/amuleweb.1 /usr/share/man/man1/ed2k.1 && \
+    rm -rf /tmp/*
+
+FROM alpine:3.23
+
+# thanks to "ngosang@hotmail.es"
+
+# Copy binaries, Web UI and man docs
+COPY --from=builder /usr/bin/alcc /usr/bin/amulecmd /usr/bin/amuled /usr/bin/amuleweb /usr/bin/ed2k /usr/bin/
+COPY --from=builder /usr/share/amule /usr/share/amule
+COPY --from=builder /usr/share/man/man1/alcc.1.gz /usr/share/man/man1/amulecmd.1.gz \
+    /usr/share/man/man1/amuled.1.gz /usr/share/man/man1/amuleweb.1.gz /usr/share/man/man1/ed2k.1.gz \
+    /usr/share/man/man1/
+
+# https://mirrors.tuna.tsinghua.edu.cn/
+# COPY docker/repositories /etc/apk/
+
+# Install runtime dependencies and remove unnecessary locale files
+RUN apk add --no-cache \
+        crypto++ readline libgcc libstdc++ libmaxminddb libupnp libpng wxwidgets tzdata pwgen curl mandoc \
+        s6 execline su-exec && \
+    rm -rf /usr/share/locale && \
+    # Check binaries are OK
+    ldd /usr/bin/alcc > /dev/null && \
+    ldd /usr/bin/amulecmd > /dev/null && \
+    ldd /usr/bin/amuled > /dev/null && \
+    ldd /usr/bin/amuleweb > /dev/null && \
+    ldd /usr/bin/ed2k > /dev/null && \
+    # Check man documentation is OK
+    man alcc > /dev/null && \
+    man amulecmd > /dev/null && \
+    man amuled > /dev/null && \
+    man amuleweb > /dev/null && \
+    man ed2k > /dev/null
+
+# Add M26 web UI
+COPY dist/ /usr/share/amule/webserver/
+
+# Add entrypoint and S6 services
+COPY --chmod=755 docker/rootfs/ /
+
+WORKDIR /home/amule
+
+EXPOSE 4711/tcp 4712/tcp 4662/tcp 4665/udp 4672/udp
+
+ENTRYPOINT ["/home/amule/entrypoint.sh"]

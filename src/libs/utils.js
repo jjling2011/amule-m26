@@ -1,0 +1,306 @@
+import { createI18n } from "vue-i18n"
+
+// 引入各个语言的配置文件（你可以按需创建 zh.js, en.js 等）
+import langEn from "@/langs/en.js"
+import langZh from "@/langs/zh.js"
+
+const langNameStorageKey = "m26-i18n-lang-name"
+const themeModeStorageKey = "m26-color-theme-name"
+
+function gotoPage(url) {
+    window.location.href = url
+}
+
+function reloadPage() {
+    window.location.href = window.location.href
+}
+
+// to-do: add task queue
+function query(data, url, timeout, method) {
+    url = url || "./serv.php"
+    method = method || (isDevEnv() ? "GET" : "POST")
+    timeout = timeout || 8000
+    data = data || {}
+
+    function ondata(resolve, reject, response) {
+        if (!response || typeof response !== "string" || !response.startsWith("{")) {
+            gotoPage("./login.php")
+            reject(new Error("not login"))
+            return
+        }
+        try {
+            const obj = JSON.parse(response)
+            resolve(obj)
+        } catch (err) {
+            // log(`[debug] query():`, response)
+            reject(err)
+        }
+    }
+
+    return new Promise((resolve, reject) => {
+        $.ajax({
+            url: url,
+            type: method,
+            data: data,
+            timeout: timeout,
+            success: (response) => ondata(resolve, reject, response),
+            error: function (xhr, status, error) {
+                if (status === "timeout") {
+                    reject(new Error("request timeout"))
+                } else {
+                    reject(
+                        new Error(
+                            `request failed!\nerror code: ${status}\nmessage: ${error.message}`,
+                        ),
+                    )
+                }
+            },
+        })
+    })
+}
+
+function isIPv4Addr(s) {
+    if (!s || typeof s !== "string") {
+        return false
+    }
+    return /^(\d{1,3}\.){3,3}\d{1,3}:\d{1,5}$/.test(s)
+}
+
+function parseIPv4Addr(s) {
+    const arr = (s || "").split(/[.:]/).map((s) => parseInt(s) || 0)
+    if (arr.length < 5) {
+        return { ipv4: 0, port: 0 }
+    }
+    const port = arr[4]
+    const ipv4 = arr[0] + (arr[1] << 8) + (arr[2] << 16) + (arr[3] << 24)
+    return { ipv4, port }
+}
+
+function extractIPv4Addr(s) {
+    if (!s || typeof s !== "string") {
+        return ""
+    }
+    const arr = s.split(/[ :]/).map((s) => parseInt(s))
+    const len = arr.length
+    if (len < 2 || !arr[len - 2]) {
+        return ""
+    }
+
+    const port = arr[len - 1]
+    let ip = arr[len - 2]
+    const addr = []
+    for (let i = 0; i < 4; i++) {
+        addr[i] = `${(ip % 256).toFixed(0)}`
+        ip = ip / 256
+    }
+    return `${addr.join(".")}:${port}`
+}
+
+function isDevEnv() {
+    return import.meta.env.DEV
+}
+
+function getBrowserLang() {
+    const browserLang = navigator.language
+    if (browserLang === "zh-CN") {
+        return "zh"
+    }
+    return "en"
+}
+
+// 获取默认语言的函数
+function getCurLangName() {
+    const savedLang = localStorage.getItem(langNameStorageKey)
+    if (savedLang) {
+        return savedLang
+    }
+    return getBrowserLang()
+}
+
+const i18n = createI18n({
+    legacy: false, // Vue 3 必须设置为 false，以启用 Composition API 模式
+    locale: getCurLangName(), // 默认显示的语言
+    fallbackLocale: "en", // 如果找不到对应翻译，回退到英语
+    messages: {
+        zh: langZh,
+        en: langEn,
+    },
+})
+
+// 切换主题的方法
+function switchTheme(theme) {
+    if (theme === "auto") {
+        theme = isSysThemeModeDark() ? "dark" : "light"
+    }
+    localStorage.setItem(themeModeStorageKey, theme)
+    if (theme === "dark") {
+        document.documentElement.setAttribute("data-theme", theme)
+    } else {
+        document.documentElement.removeAttribute("data-theme")
+    }
+}
+
+function switchLanguage(locale, lang) {
+    if (lang === "auto") {
+        lang = getBrowserLang()
+    }
+    console.log(`switch to: ${lang}`)
+    locale.value = lang
+    localStorage.setItem(langNameStorageKey, lang)
+}
+
+function isSysThemeModeDark() {
+    window.matchMedia("(prefers-color-scheme: dark)").matches
+}
+
+function getCurThemeMode() {
+    const mode = localStorage.getItem(themeModeStorageKey)
+    if (mode) {
+        return mode
+    }
+    return isSysThemeModeDark() ? "dark" : "light"
+}
+
+function log(...args) {
+    console.log(...args)
+}
+
+function formatBytes(input) {
+    // 1. 边界情况处理：如果无法转换，返回 "-"
+    if (!input) {
+        return "-"
+    }
+
+    // 2. 将字符串转换为数字
+    const bytes = Number(input)
+
+    // 3. 校验是否为有效的非负数
+    if (isNaN(bytes) || bytes < 0) {
+        return "-"
+    }
+
+    // 4. 处理 0 字节的特殊情况
+    if (bytes === 0) return "0 B"
+
+    // 5. 定义 IEC 标准单位（二进制，基数为 1024）
+    const units = ["B", "K", "M", "G", "T", "P", "E", "Z", "Y"]
+    const k = 1024
+
+    // 6. 计算应该使用的单位索引
+    const i = Math.floor(Math.log(bytes) / Math.log(k))
+
+    // 7. 格式化数值并拼接单位（保留两位小数，并去掉末尾多余的 0）
+    const formattedValue = parseFloat((bytes / Math.pow(k, i)).toFixed(1))
+    return `${formattedValue} ${units[i]}`
+}
+
+function subStrIn(needle, haystack) {
+    if (typeof needle !== "string" || typeof haystack !== "string") {
+        return false // 如果输入的不是字符串，直接返回 false
+    }
+
+    needle = needle.replace(/ /g, "")
+    if (needle === "") {
+        return true // 空字符串默认是任何字符串的子序列
+    }
+
+    if (haystack === "") {
+        return false // b 为空且 a 不为空时，肯定不包含
+    }
+
+    needle = needle.toLowerCase()
+    haystack = haystack.toLowerCase()
+
+    let i = 0 // 指向 s1 的指针
+    let j = 0 // 指向 s2 的指针
+
+    // 只要两个字符串都没遍历完，就继续比对
+    while (i < needle.length && j < haystack.length) {
+        // 如果当前字符匹配，s1 的指针向后移动
+        if (needle[i] === haystack[j]) {
+            i++
+        }
+        // 无论是否匹配，s2 的指针都要向后移动，继续寻找下一个字符
+        j++
+    }
+
+    // 如果 i 等于 s1 的长度，说明 s1 中的所有字符都按顺序在 s2 中找到了
+    return i === needle.length
+}
+
+function stripSpace(str) {
+    if (!str) {
+        return ""
+    }
+    return str.replace(/\s/g, "")
+}
+
+function flattenObject(obj, res = {}) {
+    for (let key in obj) {
+        if (typeof obj[key] === "object" && obj[key] !== null && !Array.isArray(obj[key])) {
+            flattenObject(obj[key], res)
+        } else {
+            res[key] = obj[key]
+        }
+    }
+    return res
+}
+
+function formatJson(o) {
+    return JSON.stringify(o, null, "")
+}
+
+function clone(o) {
+    return JSON.parse(JSON.stringify(o))
+}
+
+function compareString(a, b) {
+    return a.localeCompare(b, "en", { sensitivity: "base" })
+}
+
+function getValue(dict, expKey, defKey) {
+    return dict[expKey] || dict[defKey]
+}
+
+function uniqueByKey(arr, key) {
+    return [...new Map(arr.map((d) => [d[key], d])).values()]
+}
+
+async function copyToClipboard(...args) {
+    const textToCopy = args.join("\n")
+    try {
+        await navigator.clipboard.writeText(textToCopy)
+        return true
+    } catch (err) {
+        return false
+    }
+}
+
+export default {
+    log,
+    i18n,
+    isDevEnv,
+
+    query, // query(data, url, timeout, method)
+    gotoPage,
+    reloadPage,
+    clone,
+    formatBytes,
+    formatJson,
+    subStrIn,
+    stripSpace,
+    compareString,
+    getValue,
+    isIPv4Addr,
+    parseIPv4Addr,
+    extractIPv4Addr,
+    uniqueByKey,
+    copyToClipboard,
+    flattenObject,
+
+    getCurThemeMode,
+    switchTheme,
+
+    getCurLangName,
+    switchLanguage,
+}
