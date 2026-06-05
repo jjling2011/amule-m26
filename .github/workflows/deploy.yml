@@ -11,7 +11,7 @@ env:
   AMULE_ARCHIVE: "https://github.com/amule-project/amule/archive"
   REGISTRY: ghcr.io
   # 镜像名称转为小写，避免因为大小写问题导致推送失败
-  IMAGE_NAME: "amule-m26"
+  IMAGE_NAME: ${{ github.repository }}
   ARTIFACT_NAME: "template-m26"
 
 jobs:
