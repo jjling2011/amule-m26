@@ -20,9 +20,6 @@ function handle_get_req($get)
     } elseif ($cmd == "Echo") {
         $text = $get["msg"];
         response($true, $text, "");
-    } elseif ($cmd == "GetStatsTree") {
-        $stats = amule_load_vars("stats_tree");
-        response($true, "", $stats);
     } elseif ($cmd == "GetServerAddressHash") {
         $hash = calc_server_addr_hash();
         response($true, "", $hash);
@@ -355,6 +352,33 @@ function response($ok, $msg, $data)
     m26_print_json($resp);
 }
 
+function format_stats_tree($data, $indentLevel) {
+    // 如果不是数组，直接返回空字符串
+    $dt = m26_typeof($data);
+    if ( $dt != "map") {
+        return "";
+    }
+
+    $result = '';
+    // 计算当前的缩进空格（每层 4 个空格）
+    $indent = "";
+    for ($i = 0; $i < $indentLevel; $i++) {
+        $indent .= "    ";
+    } 
+
+    foreach ($data as $key => $value) {
+        // 拼接当前 key 和换行符（PHP 中用 \n 或 PHP_EOL）
+        $result .= $indent . m26_escape($key) . "\n";
+        // 如果值是数组（嵌套结构），则递归进入下一层，缩进等级 + 1
+        $vt = m26_typeof($value);
+        if ($vt == "map") {
+            $result .= format_stats_tree($value, $indentLevel + 1);
+        }
+    }
+
+    return $result;
+}
+
 function get_logs($reset)
 {
     $p = "0";
@@ -363,9 +387,12 @@ function get_logs($reset)
     }
     $alog = amule_get_log($p);
     $slog = amule_get_serverinfo($p);
+    $tree = amule_load_vars("stats_tree");
+    $stats = format_stats_tree($tree, 0);
     $logs = array(
         "amule" => $alog,
-        "server" => $slog
+        "server" => $slog,
+        "stats" => $stats
     );
     return $logs;
 }

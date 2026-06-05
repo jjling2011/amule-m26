@@ -2,6 +2,7 @@
 import { onMounted, onUnmounted, ref, computed, nextTick } from "vue"
 import { useI18n } from "vue-i18n"
 import utils from "@/libs/utils.js"
+import efixer from "@/libs/encoding-fixer.js"
 import compos from "@/libs/compos.js"
 
 const { t } = useI18n()
@@ -13,34 +14,32 @@ const autoScroll = ref(true)
 
 const curLogText = computed(() => {
     const cat = getCurCat()
-    if (autoScroll.value) {
+    if (autoScroll.value && cat !== "stats") {
         nextTick(() => {
             if (textareaRef.value) {
                 textareaRef.value.scrollTop = textareaRef.value.scrollHeight
             }
         })
     }
-    return allLogs.value[cat]
+    const log = allLogs.value[cat]
+    const log_hr = efixer.autoFixString(log)
+    return log_hr
 })
 
 function getCurCat() {
-    return logType.value === "server" ? "server" : "amule"
-}
-
-async function refreshUI() {
-    try {
-        const resp = await utils.query({ cmd: "GetLogs" })
-        setLog(resp)
-    } catch (err) {
-        window.dialogs.alert(err.message)
+    const cats = ["server", "amule", "stats"]
+    const cat = logType.value
+    if (cats.indexOf(cat) < 0) {
+        return cats[0]
     }
+    return cat
 }
 
 async function clearAllLogs() {
     try {
         const resp = await utils.query({ cmd: "ClearLogs" })
         utils.log(`server: ${resp.msg}`)
-        refreshUI()
+        setLog(resp)
     } catch (err) {
         window.dialogs.alert(err.message)
     }
@@ -52,10 +51,8 @@ function setLog(resp) {
 
 let pullCtrl
 onMounted(async function () {
-    const req = { cmd: "GetLogs" }
-
-    await refreshUI()
-    pullCtrl = compos.startPulling(req, setLog)
+    pullCtrl = compos.startPulling({ cmd: "GetLogs" }, setLog)
+    pullCtrl.trigger()
 })
 
 onUnmounted(function () {
@@ -70,6 +67,7 @@ onUnmounted(function () {
             <select v-model="logType" style="margin-right: 1rem">
                 <option value="amule">amule</option>
                 <option value="server">server</option>
+                <option value="stats">stats</option>
             </select>
             <button @click="clearAllLogs()" style="margin-right: 1rem">
                 {{ t("logs.clear_all_logs") }}

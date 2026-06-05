@@ -57,6 +57,11 @@ function startPulling(request, resolve, reject, interval = 5000) {
         }
     }
 
+    function trigger() {
+        clearTimeout(handle)
+        doWork()
+    }
+
     function stop() {
         stopped = true
         // utils.log(`[debug] call stop: ${utils.formatJson(request)}`)
@@ -76,6 +81,7 @@ function startPulling(request, resolve, reject, interval = 5000) {
     restart()
 
     return {
+        trigger,
         stop,
         restart,
     }

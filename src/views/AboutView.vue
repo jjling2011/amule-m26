@@ -1,19 +1,17 @@
 <script setup>
-import { useI18n } from "vue-i18n"
-const { t } = useI18n()
+const githubUrl = "https://github.com/jjling2011/amule-m26/"
+const dockerUrl = "https://github.com/jjling2011/amule-m26/pkgs/container/amule-m26"
 
-function logout() {
-    window.location.href = "login.php"
+function goto(url) {
+    window.open(url, "_blank")
 }
 </script>
 
 <template>
     <div class="toolbar">
         <div class="toolstrip">
-            <button @click="logout">
-                <i class="fa fa-sign-out" aria-hidden="true" style="color: var(--fg-color)"></i>
-                {{ t("about.logout") }}
-            </button>
+            <button @click="goto(githubUrl)" :title="githubUrl">GitHub</button>
+            <button @click="goto(dockerUrl)" :title="dockerUrl">Docker</button>
         </div>
     </div>
     <div class="table-header">
@@ -40,6 +38,10 @@ https://github.com/amule-project/
 <style scoped>
 .container {
     display: flex;
+}
+
+.toolstrip button {
+    margin-right: 0.5rem;
 }
 
 .about-content {

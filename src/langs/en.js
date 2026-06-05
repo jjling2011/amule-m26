@@ -21,7 +21,7 @@ export default {
         about: "About",
     },
     about: {
-        logout: "Log out",
+        stats: "Stats.",
     },
     dialogs: {
         ok: "Ok",
@@ -83,7 +83,8 @@ export default {
         complete: "Complete",
     },
     prefs: {
-        save: "Save Prefs.",
+        logout: "Log out",
+        save: "Save",
         key: "Key",
         value: "Value",
         description: "Description",

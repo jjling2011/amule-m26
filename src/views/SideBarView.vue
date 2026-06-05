@@ -129,7 +129,7 @@ onMounted(function () {
             <span>UID:</span>
             <span :title="getUserID()">{{ getUserID() }}</span>
         </div>
-        <div class="serv-stats" style="margin-bottom: 0.5rem">
+        <div class="serv-stats" style="margin-bottom: 1rem">
             <span>Server:</span>
             <span :title="getServStats()">{{ getServStats() }}</span>
         </div>

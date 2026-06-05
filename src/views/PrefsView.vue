@@ -118,6 +118,10 @@ async function applyPrefs() {
     }
 }
 
+function logout() {
+    window.location.href = "login.php"
+}
+
 function getDescription(cat, key) {
     if (isDisabled(cat, key)) {
         return t("prefs.readonly")
@@ -138,6 +142,14 @@ onUnmounted(function () {
 <template>
     <div class="toolbar">
         <div class="toolstrip">
+            <button @click="applyPrefs" style="margin-right: 1rem">
+                <i class="fa fa-floppy-o" aria-hidden="true" style="color: var(--fg-color)"></i>
+                {{ t("prefs.save") }}
+            </button>
+            <button @click="logout()" style="margin-right: 1rem">
+                <i class="fa fa-sign-out" aria-hidden="true" style="color: var(--fg-color)"></i>
+                {{ t("prefs.logout") }}
+            </button>
             <div class="switcher-group">
                 <label for="lang-select">Language</label>
                 <select id="lang-select" v-model="currentLocale">
@@ -152,8 +164,6 @@ onUnmounted(function () {
                     <option value="dark">{{ t("theme.dark") }}</option>
                 </select>
             </div>
-
-            <button @click="applyPrefs" style="margin-right: 1rem">{{ t("prefs.save") }}</button>
         </div>
     </div>
     <div class="table-header">
@@ -259,12 +269,12 @@ onUnmounted(function () {
     flex-grow: 1;
     display: flex;
     flex-direction: row;
-    background-color: var(--prefs-row);
+    background-color: var(--bg-color);
     align-items: center;
 }
 
 .pref-row:nth-child(even) {
-    background-color: var(--bg-color);
+    background-color: var(--table-row-even);
 }
 
 .pref-key {

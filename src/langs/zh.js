@@ -21,7 +21,7 @@ export default {
         about: "关于",
     },
     about: {
-        logout: "注销",
+        stats: "统计信息",
     },
     dialogs: {
         ok: "确定",
@@ -83,7 +83,8 @@ export default {
         complete: "完成度",
     },
     prefs: {
-        save: "保存选项",
+        logout: "注销",
+        save: "保存",
         key: "键",
         value: "值",
         description: "描述（我也不懂这些选项是啥）",

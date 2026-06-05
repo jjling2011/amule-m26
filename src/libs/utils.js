@@ -246,8 +246,32 @@ function flattenObject(obj, res = {}) {
     return res
 }
 
+function formatJsonKeys(obj, indentLevel = 0) {
+    // 如果不是对象或者是 null，返回空字符串
+    if (typeof obj !== "object" || obj === null) {
+        return ""
+    }
+
+    let result = ""
+    const indent = " ".repeat(indentLevel * 4)
+
+    for (const key in obj) {
+        if (obj.hasOwnProperty(key)) {
+            // 拼接当前 key 和换行符
+            result += `${indent}${key}\n`
+
+            // 如果是嵌套对象，递归获取子层的字符串并拼接
+            if (typeof obj[key] === "object" && obj[key] !== null) {
+                result += formatJsonKeys(obj[key], indentLevel + 1)
+            }
+        }
+    }
+
+    return result
+}
+
 function formatJson(o) {
-    return JSON.stringify(o, null, "")
+    return JSON.stringify(o, null, "  ")
 }
 
 function clone(o) {
@@ -287,6 +311,7 @@ export default {
     clone,
     formatBytes,
     formatJson,
+    formatJsonKeys,
     subStrIn,
     stripSpace,
     compareString,

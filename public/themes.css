@@ -14,8 +14,7 @@
     --table-header-color: rgb(212 189 147);
     --table-row-even: rgb(228 220 207);
 
-    --prefs-cat: rgb(169 165 159);
-    --prefs-row: #e6dfd2;
+    --prefs-cat: rgb(190 178 160);
 }
 
 /* dark mode */
@@ -34,7 +33,6 @@
     --table-row-even: rgb(36 48 71);
 
     --prefs-cat: rgb(56 81 124);
-    --prefs-row: rgb(29 41 59);
 }
 
 * {

@@ -143,7 +143,6 @@
                     <button id="cmd-get-search-result">Search Res</button>
                     <button id="cmd-get-search-hashes">Search Hash</button>
                     <button id="cmd-get-prefs">Get Prefs.</button>
-                    <button id="cmd-get-stats-tree">Stats Tree</button>
                 </div>
                 <div class="row">
                     <button id="btn-login">Login</button>
@@ -194,10 +193,6 @@
 
             function initUI() {
                 fixTabKey(tboxParams)
-
-                $("#cmd-get-stats-tree").click(function () {
-                    myfetch({ cmd: "GetStatsTree" })
-                })
 
                 $("#cmd-get-prefs").click(function () {
                     myfetch({ cmd: "GetPrefs" })

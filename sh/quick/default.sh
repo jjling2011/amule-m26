@@ -1,7 +1,7 @@
 #/usr/bin/env bash
 
-name="amule-m26-default"
-image="ghcr.nju.edu.cn/jjling2011/amule-m26:v0.1.0"
+name="amule-m26-q"
+image="amule-m26:latest"
 
 echo "Remove container: ${name}"
 sudo docker rm -f "${name}"
