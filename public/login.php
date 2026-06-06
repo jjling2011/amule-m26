@@ -207,12 +207,11 @@
 
 <body>
 <?php
-$ver = amule_get_version();
+$ver = m26_get_version();
 if(!m26_startswith("amule-m26", $ver)){
 
     echo "<pre>";
-    echo "Sorry, you are using ".$ver."\n";
-    echo "This web UI require amule-m26 mod.\n";
+    echo "This web UI require amule-m26 backend.\n";
     
     echo "</pre>";
     echo '<a href="https://github.com/jjling2011/amule-m26/">amule-m26</a>';
@@ -220,7 +219,7 @@ if(!m26_startswith("amule-m26", $ver)){
 ?>
     <div id="dialog-prompt"
 <?php
-$ver = amule_get_version();
+$ver = m26_get_version();
 if(!m26_startswith("amule-m26", $ver)){
     echo  ' style="display:none" ';
 }

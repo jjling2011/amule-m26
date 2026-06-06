@@ -28,8 +28,15 @@ const comparers = {
 }
 
 const sortTag = compos.useLocalStorage("m26-search-sort-tag", "none")
-const sortOrdering = compos.useLocalStorage("m26-search-sort-ordering", "descending")
+const sortOrder = compos.useLocalStorage("m26-search-sort-ordering", "descending")
 const filterSubStr = ref("")
+
+function getOrderSign(name) {
+    if (name !== sortTag.value) {
+        return ""
+    }
+    return sortOrder.value === "descending" ? " ↓" : " ↑"
+}
 
 function transform(file, selected, name_hr, dlHashes) {
     const r = utils.clone(file)
@@ -59,7 +66,7 @@ const orderedModel = computed((prev) => {
 
     const st = sortTag.value
     if (st && st !== "none") {
-        const reverse = sortOrdering.value === "descending" ? (cond) => -1 * cond : (cond) => cond
+        const reverse = sortOrder.value === "descending" ? (cond) => -1 * cond : (cond) => cond
         const comparer = utils.getValue(comparers, sortTag.value, "sources")(reverse)
         r.sort(comparer)
     }
@@ -69,7 +76,7 @@ const orderedModel = computed((prev) => {
 
 function switchSortKeyTo(key) {
     if (sortTag.value === key) {
-        sortOrdering.value = sortOrdering.value === "descending" ? "ascending" : "descending"
+        sortOrder.value = sortOrder.value === "descending" ? "ascending" : "descending"
     } else {
         sortTag.value = key
     }
@@ -198,7 +205,7 @@ onUnmounted(function () {
                 <option value="name">{{ t("search.name") }}</option>
                 <option value="none">{{ t("search.none") }}</option>
             </select>
-            <select v-model="sortOrdering" class="select-sort-direction" style="margin-right: 1rem">
+            <select v-model="sortOrder" class="select-sort-direction" style="margin-right: 1rem">
                 <option value="ascending">{{ t("app.ascending") }}</option>
                 <option value="descending">{{ t("app.descending") }}</option>
             </select>
@@ -237,15 +244,14 @@ onUnmounted(function () {
         <span
             style="width: 4rem; flex-shrink: 0; text-align: right; cursor: pointer"
             @click="switchSortKeyTo('sources')"
-            >{{ t("search.sources") }}</span
+            >{{ t("search.sources") }}{{ getOrderSign("sources") }}</span
         >
-        <span
-            style="width: 5rem; flex-shrink: 0; cursor: pointer"
-            @click="switchSortKeyTo('size')"
-            >{{ t("search.size") }}</span
+        <span style="width: 5rem; flex-shrink: 0; cursor: pointer" @click="switchSortKeyTo('size')"
+            >{{ t("search.size") }}{{ getOrderSign("size") }}</span
         >
         <span style="flex-grow: 1; cursor: pointer" @click="switchSortKeyTo('name')"
-            >{{ t("search.name") }} ({{ selectedModelCount }} / {{ countTotal() }})</span
+            >{{ t("search.name") }}{{ getOrderSign("name") }} ({{ selectedModelCount }} /
+            {{ countTotal() }})</span
         >
     </div>
     <div class="container">

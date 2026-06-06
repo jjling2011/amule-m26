@@ -122,12 +122,12 @@ onMounted(function () {
             <span title="upload, download">{{ getSpeed() }}</span>
         </div>
         <div class="serv-stats">
-            <span>KAD:</span>
-            <span>{{ getKadStats() }}</span>
-        </div>
-        <div class="serv-stats">
             <span>UID:</span>
             <span :title="getUserID()">{{ getUserID() }}</span>
+        </div>
+        <div class="serv-stats">
+            <span>KAD:</span>
+            <span>{{ getKadStats() }}</span>
         </div>
         <div class="serv-stats" style="margin-bottom: 1rem">
             <span>Server:</span>
@@ -165,7 +165,7 @@ onMounted(function () {
     width: 14rem;
     position: fixed;
     height: 100%;
-    z-index: 200;
+    z-index: 100;
     display: flex;
     flex-direction: column;
     background-color: var(--sidebar-bg-color);

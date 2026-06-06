@@ -1,11 +1,30 @@
 <script setup>
 import { onMounted, onUnmounted, ref, computed } from "vue"
+import DropdownButton from "@/widgets/DropdownButton.vue"
+
 import { useI18n } from "vue-i18n"
 import utils from "@/libs/utils.js"
 import efixer from "@/libs/encoding-fixer.js"
 import compos from "@/libs/compos.js"
 
 const { t } = useI18n()
+
+const taskCommands = ["pause", "resume", "cancel", "priodown", "prioup"]
+// 在父组件中维护数据和文案
+const taskActions = taskCommands.map((cmd) => {
+    return { label: t(`download.${cmd}`), action: cmd }
+})
+taskActions.push({ label: t("download.copy_link"), action: "copy_link" })
+
+const handleTaskAction = (actionType) => {
+    if (taskCommands.indexOf(actionType) >= 0) {
+        doTaskCommand(actionType)
+    } else if (actionType === "copy_link") {
+        copy_ed2k_links()
+    } else {
+        window.dialogs.alert(`unknow ation type: ${actionType}`)
+    }
+}
 
 const selectAll = ref(false)
 const triggerRef = ref(0)
@@ -30,6 +49,13 @@ const comparers = {
 
 const sortTag = compos.useLocalStorage("m26-download-sort-tag", "size")
 const sortOrder = compos.useLocalStorage("m26-download-sort-order", "descending")
+
+function getOrderSign(name) {
+    if (name !== sortTag.value) {
+        return ""
+    }
+    return sortOrder.value === "descending" ? " ↓" : " ↑"
+}
 
 function switchSortKeyTo(key) {
     if (sortTag.value === key) {
@@ -94,18 +120,14 @@ async function copy_ed2k_links() {
         return
     }
 
-    const links = files.map((d) => {
-        d.checked = false
-        return d.link
-    })
+    const links = files.map((d) => d.link)
     const ok = await utils.copyToClipboard(...links)
     const msg = ok ? t("download.copy_success") : t("download.copy_fail")
     window.dialogs.alert(msg)
 }
 
 async function doTaskCommand(taskcmd) {
-    const cmds = ["pause", "resume", "priodown", "cancel", "prioup"]
-    if (cmds.indexOf(taskcmd) < 0) {
+    if (taskCommands.indexOf(taskcmd) < 0) {
         window.dialogs.alert(`${t("download.unsupported_cmd")} ${taskcmd}`)
         return
     }
@@ -185,15 +207,6 @@ onUnmounted(function () {
                 <option value="descending">{{ t("app.descending") }}</option>
             </select>
 
-            <button @click="doTaskCommand('pause')">{{ t("download.pause") }}</button>
-            <button @click="doTaskCommand('resume')">{{ t("download.resume") }}</button>
-            <button @click="doTaskCommand('cancel')">
-                {{ t("download.cancel") }}
-            </button>
-            <button @click="copy_ed2k_links()" style="margin-right: 1rem">
-                {{ t("download.copy_link") }}
-            </button>
-
             <input
                 style="width: 10rem; margin-right: 1rem"
                 class="task-subtle-col"
@@ -201,16 +214,12 @@ onUnmounted(function () {
                 :placeholder="t('app.filter') + '(' + t('download.name') + ')'"
             />
 
-            <button @click="doTaskCommand('prioup')" class="task-subtle-col">
-                {{ t("download.prioup") }}
-            </button>
-            <button
-                @click="doTaskCommand('priodown')"
-                class="task-subtle-col"
+            <DropdownButton
                 style="margin-right: 1rem"
-            >
-                {{ t("download.priodown") }}
-            </button>
+                :button-label="t('download.task_action')"
+                :menu-items="taskActions"
+                @action="handleTaskAction"
+            />
         </div>
     </div>
     <div class="table-header">
@@ -218,26 +227,27 @@ onUnmounted(function () {
             <input type="checkbox" v-model="selectAll" @change="onSelectAllChange" />
         </span>
         <span style="flex-grow: 1; cursor: pointer" @click="switchSortKeyTo('name')"
-            >{{ t("download.name") }} ({{ selectedTaskCount }} / {{ countTotal() }})</span
+            >{{ t("download.name") }}{{ getOrderSign("name") }} ({{ selectedTaskCount }} /
+            {{ countTotal() }})</span
         >
-        <span style="width: 6rem; cursor: pointer" @click="switchSortKeyTo('cat')">{{
-            t("download.cat")
-        }}</span>
-        <span style="width: 5rem; cursor: pointer" @click="switchSortKeyTo('size')">{{
-            t("download.size")
-        }}</span>
-        <span style="width: 5rem; cursor: pointer" @click="switchSortKeyTo('complete')">{{
-            t("download.complete")
-        }}</span>
-        <span class="task-subtle-col" @click="switchSortKeyTo('speed')">{{
-            t("download.speed")
-        }}</span>
-        <span class="task-subtle-col" @click="switchSortKeyTo('prio')">{{
-            t("download.prio")
-        }}</span>
-        <span class="task-subtle-col" @click="switchSortKeyTo('status')">{{
-            t("download.status")
-        }}</span>
+        <span style="width: 6rem; cursor: pointer" @click="switchSortKeyTo('cat')"
+            >{{ t("download.cat") }}{{ getOrderSign("cat") }}</span
+        >
+        <span style="width: 5rem; cursor: pointer" @click="switchSortKeyTo('size')"
+            >{{ t("download.size") }}{{ getOrderSign("size") }}</span
+        >
+        <span style="width: 5rem; cursor: pointer" @click="switchSortKeyTo('complete')"
+            >{{ t("download.complete") }}{{ getOrderSign("complete") }}</span
+        >
+        <span class="task-subtle-col" @click="switchSortKeyTo('speed')"
+            >{{ t("download.speed") }}{{ getOrderSign("speed") }}</span
+        >
+        <span class="task-subtle-col" @click="switchSortKeyTo('prio')"
+            >{{ t("download.prio") }}{{ getOrderSign("prio") }}</span
+        >
+        <span class="task-subtle-col" @click="switchSortKeyTo('status')"
+            >{{ t("download.status") }}{{ getOrderSign("status") }}</span
+        >
     </div>
     <div class="container">
         <div class="table-row" v-for="(item, index) in sortedTasks" :key="index">

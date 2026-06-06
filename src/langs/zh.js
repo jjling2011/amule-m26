@@ -34,8 +34,8 @@ export default {
         links: "链接",
     },
     logs: {
-        cat: "日志类别",
-        clear_all_logs: "清空全部日志",
+        cat: "类别",
+        clear_all_logs: "清空日志",
         autoscroll: "自滚动",
     },
     search: {
@@ -50,6 +50,9 @@ export default {
         invalid_ipv4: "无效的 IPv4 地址",
         bootstrap: "引导",
         connect: "连接",
+        disconnect_server: "断开服务器连接",
+        disconnect_kad: "断开 KAD 连接",
+        connect_kad: "连接 KAD 网络",
         disconnect: "断开连接",
         remove: "删除",
         confirmRemoveServer: "确定要删除服务器吗？",
@@ -62,6 +65,7 @@ export default {
         files: "文件数",
     },
     download: {
+        task_action: "操作",
         copy_success: "已复制",
         copy_fail: "复制失败",
         pause: "暂停",

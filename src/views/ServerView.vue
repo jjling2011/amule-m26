@@ -1,5 +1,7 @@
 <script setup>
 import { onMounted, onUnmounted, watch, ref, computed } from "vue"
+import DropdownButton from "@/widgets/DropdownButton.vue"
+
 import { useI18n } from "vue-i18n"
 import utils from "@/libs/utils.js"
 import compos from "@/libs/compos.js"
@@ -29,7 +31,7 @@ async function connectServer(ip, port) {
     }
 }
 
-async function disconnectAllServer() {
+async function disconnectServer() {
     try {
         await utils.query({ cmd: "DisconnectServer" })
     } catch (err) {
@@ -72,6 +74,14 @@ const comparers = {
 
 const sortTag = compos.useLocalStorage("m26-server-sort-tag", "files")
 const sortOrder = compos.useLocalStorage("m26-server-sort-order", "descending")
+
+function getOrderSign(name) {
+    if (name !== sortTag.value) {
+        return ""
+    }
+    return sortOrder.value === "descending" ? " ↓" : " ↑"
+}
+
 function switchSortKeyTo(key) {
     if (sortTag.value === key) {
         sortOrder.value = sortOrder.value === "descending" ? "ascending" : "descending"
@@ -88,9 +98,9 @@ const sortedServers = computed(() => {
     return r
 })
 
-const kad_param = ref("")
-async function connectKAD() {
-    const p = kad_param.value || ""
+const kad_bootstrap_param = ref("")
+async function bootstrapKAD() {
+    const p = kad_bootstrap_param.value || ""
     const req = {}
     if (utils.isIPv4Addr(p)) {
         req["cmd"] = "KADConnectIPPort"
@@ -108,8 +118,8 @@ async function connectKAD() {
         req["url"] = p
         utils.log(`connect KAD URL: ${p}`)
     } else {
-        req["cmd"] = "StartKAD"
-        utils.log(`start KAD from known node`)
+        window.dialogs.alert(`Invalid bootstrap param: ${p}`)
+        return
     }
 
     try {
@@ -125,12 +135,41 @@ async function connectKAD() {
     }
 }
 
+async function connectKAD() {
+    utils.log(`start KAD from known node`)
+    try {
+        const response = await utils.query({ cmd: "StartKAD" })
+        const msg = response.msg
+        utils.log(`server: ${msg}`)
+    } catch (err) {
+        window.dialogs.alert(err.message)
+    }
+}
+
 async function disconnectKAD() {
     try {
         const response = await utils.query({ cmd: "DisconnectKAD" })
         utils.log(`server: ${response.msg}`)
     } catch (err) {
         window.dialogs.alert(err.message)
+    }
+}
+
+const connectActions = [
+    { label: t(`servers.disconnect_server`), action: "server" },
+    { label: t(`servers.disconnect_kad`), action: "dis_kad" },
+    { label: t(`servers.connect_kad`), action: "conn_kad" },
+]
+
+function handleConnectAction(action) {
+    if (action === "server") {
+        disconnectServer()
+    } else if (action === "dis_kad") {
+        disconnectKAD()
+    } else if (action === "conn_kad") {
+        connectKAD()
+    } else {
+        window.dialogs.alert(`unknow disconnect target: ${action}`)
     }
 }
 
@@ -163,36 +202,40 @@ onUnmounted(function () {
                 <option value="ascending">{{ t("app.ascending") }}</option>
                 <option value="descending">{{ t("app.descending") }}</option>
             </select>
-            <button @click="disconnectAllServer" style="margin-right: 1rem">
-                {{ t("servers.disconnect") }}
-            </button>
+
+            <DropdownButton
+                style="margin-right: 1rem"
+                :button-label="t('servers.connect')"
+                :menu-items="connectActions"
+                @action="handleConnectAction"
+            />
+
             <span>KAD</span>
-            <input v-model="kad_param" class="kad-param" placeholder="URL, IPv4:port" />
-            <button @click="connectKAD()">
+            <input v-model="kad_bootstrap_param" class="kad-param" placeholder="URL, IPv4:port" />
+            <button @click="bootstrapKAD()" style="margin-right: 1rem">
                 {{ t("servers.bootstrap") }}
-            </button>
-            <button @click="disconnectKAD()" style="margin-right: 1rem">
-                {{ t("servers.disconnect") }}
             </button>
         </div>
     </div>
     <div class="table-header">
-        <span style="width: 7em">{{ t("servers.action") }}</span>
-        <span class="server-name-col" style="cursor: pointer" @click="switchSortKeyTo('name')">{{
-            t("servers.name")
-        }}</span>
-        <span class="server-desc-col">{{ t("servers.description") }}</span>
-        <span style="width: 12em">{{ t("servers.address") }}</span>
-        <span style="width: 6em; cursor: pointer" @click="switchSortKeyTo('users')">{{
-            t("servers.users")
-        }}</span>
-        <span style="width: 7em; cursor: pointer" @click="switchSortKeyTo('files')">{{
-            t("servers.files")
+        <span style="width: 6rem">{{ t("servers.action") }}</span>
+        <span class="server-name-col" style="cursor: pointer" @click="switchSortKeyTo('name')"
+            >{{ t("servers.name") }}{{ getOrderSign("name") }}</span
+        >
+        <span style="width: 6rem; cursor: pointer" @click="switchSortKeyTo('files')"
+            >{{ t("servers.files") }}{{ getOrderSign("files") }}</span
+        >
+        <span style="width: 6rem; cursor: pointer" @click="switchSortKeyTo('users')"
+            >{{ t("servers.users") }}{{ getOrderSign("users") }}</span
+        >
+        <span style="width: 10rem">{{ t("servers.address") }}</span>
+        <span class="server-desc-col" style="justify-content: start; padding-left: 1rem">{{
+            t("servers.description")
         }}</span>
     </div>
     <div class="container">
         <div class="table-row" v-for="(item, index) in sortedServers" :key="index">
-            <span style="width: 7em">
+            <span style="width: 6rem">
                 <span v-if="isConnected(item.address)">
                     {{ t("servers.active") }}
                 </span>
@@ -212,18 +255,18 @@ onUnmounted(function () {
                 </div>
             </span>
             <span class="server-name-col">{{ item.name }}</span>
-            <span class="server-desc-col" style="text-align: left">
-                {{ item.description }}
-            </span>
+            <span style="width: 6rem; text-align: right">{{ item.files }}</span>
+            <span style="width: 6rem; text-align: right">{{ item.users }}</span>
             <span
-                style="width: 12em; text-align: right"
+                style="width: 10rem; text-align: right"
                 :data-ipv4="item.ip"
                 :data-port="item.port"
             >
                 {{ item.address }}
             </span>
-            <span style="width: 6em; text-align: right">{{ item.users }}</span>
-            <span style="width: 7em; text-align: right; padding-right: 1rem">{{ item.files }}</span>
+            <span class="server-desc-col" style="text-align: left; padding-left: 1rem">
+                {{ item.description }}
+            </span>
         </div>
 
         <div style="width: 100%; height: 3rem"><!-- place holder --></div>

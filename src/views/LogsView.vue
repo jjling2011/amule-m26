@@ -12,11 +12,13 @@ const allLogs = ref({})
 const textareaRef = ref(null)
 const autoScroll = ref(true)
 
+let isAutoScroll = false
 const curLogText = computed(() => {
     const cat = getCurCat()
     if (autoScroll.value && cat !== "stats") {
         nextTick(() => {
             if (textareaRef.value) {
+                isAutoScroll = true
                 textareaRef.value.scrollTop = textareaRef.value.scrollHeight
             }
         })
@@ -25,6 +27,14 @@ const curLogText = computed(() => {
     const log_hr = efixer.autoFixString(log)
     return log_hr
 })
+
+function onTextareaScroll() {
+    const cat = getCurCat()
+    if (!isAutoScroll && cat !== "stats") {
+        autoScroll.value = false
+    }
+    isAutoScroll = false
+}
 
 function getCurCat() {
     const cats = ["server", "amule", "stats"]
@@ -79,10 +89,10 @@ onUnmounted(function () {
         </div>
     </div>
     <div class="table-header">
-        <span style="flex-grow: 1">Logs</span>
+        <span style="flex-grow: 1">{{ logType }}</span>
     </div>
     <div class="container">
-        <textarea ref="textareaRef" v-model="curLogText"></textarea>
+        <textarea ref="textareaRef" v-model="curLogText" @scroll="onTextareaScroll"></textarea>
     </div>
 </template>
 

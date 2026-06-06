@@ -34,8 +34,8 @@ export default {
         links: "links",
     },
     logs: {
-        cat: "Log cat.",
-        clear_all_logs: "Clear all logs",
+        cat: "Cat.",
+        clear_all_logs: "Clear logs",
         autoscroll: "Auto scroll",
     },
     search: {
@@ -50,6 +50,9 @@ export default {
         invalid_ipv4: "Invalide IPv4 address",
         bootstrap: "Bootstrap",
         connect: "Connect",
+        disconnect_server: "Disconnect Server",
+        disconnect_kad: "Disconnect KAD",
+        connect_kad: "Connect KAD",
         disconnect: "Disconnect",
         remove: "Remove",
         confirmRemoveServer: "Remove server?",
@@ -62,6 +65,7 @@ export default {
         files: "Files",
     },
     download: {
+        task_action: "Action",
         copy_success: "Copied to clipboard.",
         copy_fail: "Fail to copy to clipboard.",
         pause: "Pause",

@@ -6,8 +6,8 @@ function do_test($get, $session) {
     
 
     echo "<pre>";
-    echo "test_amule_version:\n";
-    test_amule_version();
+    echo "test_version:\n";
+    test_m26_version();
 
     echo "\ntest_url_param:\n";
     test_url_param($get, $session);
@@ -78,13 +78,15 @@ function test_m26_typeof() {
         echo "type is object(): ".$ok."\n";
         break;
     }
-
-    
 }
     
-function test_amule_version(){
-    $ver = amule_get_version();
-    echo $ver."\n";
+function test_m26_version(){
+    $mver = m26_get_version();
+    echo "  m26: ".$mver."\n";
+    $fver = m26_function_that_not_exist();
+    echo " fake:".$fver."\n";
+    $aver = amule_get_version();
+    echo "amule: ".$aver."\n";
 }
 
 function test_m26_escape() {
