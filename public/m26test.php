@@ -82,11 +82,16 @@ function test_m26_typeof() {
     
 function test_m26_version(){
     $mver = m26_get_version();
-    echo "  m26: ".$mver."\n";
+    $mmatch = m26_startswith("amule-m26", "".$mver);
+    echo "  m26: ".$mver." match: ".$mmatch."\n";
+
     $fver = m26_function_that_not_exist();
-    echo " fake:".$fver."\n";
+    $fmatch = m26_startswith("amule-m26", "".$fver);
+    echo " fake:".$fver." match: ".$fmatch."\n";
+
     $aver = amule_get_version();
-    echo "amule: ".$aver."\n";
+    $amatch = m26_startswith("amule-m26", "".$aver);
+    echo "amule: ".$aver." match: ".$amatch."\n";
 }
 
 function test_m26_escape() {

@@ -49,40 +49,25 @@ index 1ddafac43..c6f318b3b 100644
  		sURL += (sURL.Find('?') != wxNOT_FOUND ? "&" : "?") + sData.Left(dwDataLen);
  	}
  
-diff --git a/src/webserver/src/php_amule_lib.cpp b/src/webserver/src/php_amule_lib.cpp
-index 949369fe0..f3a973eb6 100644
---- a/src/webserver/src/php_amule_lib.cpp
-+++ b/src/webserver/src/php_amule_lib.cpp
-@@ -1121,7 +1121,7 @@ void amule_version(PHP_VALUE_NODE *val)
- 	value_value_free(val);
- 
- 	val->type = PHP_VAL_STRING;
--	val->str_val = strdup(PACKAGE_VERSION);
-+	val->str_val = strdup("amule-m26 v3.0.0-dev");
- }
- 
- 
-diff --git a/src/webserver/src/php_amule_lib_standalone.cpp b/src/webserver/src/php_amule_lib_standalone.cpp
-index 449c29fdd..663686efc 100644
---- a/src/webserver/src/php_amule_lib_standalone.cpp
-+++ b/src/webserver/src/php_amule_lib_standalone.cpp
-@@ -506,7 +506,7 @@ void amule_version(PHP_VALUE_NODE *val)
- 	value_value_free(val);
- 
- 	val->type = PHP_VAL_STRING;
--	val->str_val = strdup(PACKAGE_VERSION);
-+	val->str_val = strdup("amule-m26-standalone v3.0.0-dev");
- }
- 
- 
 diff --git a/src/webserver/src/php_core_lib.cpp b/src/webserver/src/php_core_lib.cpp
-index 95498d378..93899220f 100644
+index 95498d378..f3d1e6c59 100644
 --- a/src/webserver/src/php_core_lib.cpp
 +++ b/src/webserver/src/php_core_lib.cpp
-@@ -453,7 +453,298 @@ void php_native_ngettext(PHP_VALUE_NODE *result)
+@@ -453,7 +453,313 @@ void php_native_ngettext(PHP_VALUE_NODE *result)
  }
  #endif
  
++void m26_get_version(PHP_VALUE_NODE *val)
++{
++	if ( !val ) {
++		return;
++	}
++	value_value_free(val);
++
++	val->type = PHP_VAL_STRING;
++	val->str_val = strdup("amule-m26 v0.1.0");
++}
++
 +// PHP_VAL_INT m26_hash_string(PHP_VAL_STRING string, PHP_VAL_INT oldHash)
 +void m26_hash_string(PHP_VALUE_NODE *result)
 +{
@@ -374,6 +359,10 @@ index 95498d378..93899220f 100644
 +	{
 +		"m26_typeof",
 +		1, m26_typeof_node,
++	},
++	{
++		"m26_get_version",
++		0, m26_get_version,
 +	},
  	{
  		"var_dump",

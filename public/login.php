@@ -208,7 +208,7 @@
 <body>
 <?php
 $ver = m26_get_version();
-if(!m26_startswith("amule-m26", $ver)){
+if(!m26_startswith("amule-m26", "".$ver)){
 
     echo "<pre>";
     echo "This web UI require amule-m26 backend.\n";
@@ -220,7 +220,7 @@ if(!m26_startswith("amule-m26", $ver)){
     <div id="dialog-prompt"
 <?php
 $ver = m26_get_version();
-if(!m26_startswith("amule-m26", $ver)){
+if(!m26_startswith("amule-m26", "".$ver)){
     echo  ' style="display:none" ';
 }
 ?> 
