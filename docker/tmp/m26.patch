@@ -1,8 +1,18 @@
 diff --git a/src/webserver/src/WebServer.cpp b/src/webserver/src/WebServer.cpp
-index f8c65bd05..f27ca50ff 100644
+index f8c65bd05..e2d07ecbc 100644
 --- a/src/webserver/src/WebServer.cpp
 +++ b/src/webserver/src/WebServer.cpp
-@@ -494,6 +494,9 @@ void CWebServerBase::Send_Server_Cmd(uint32 ip, uint16 port, wxString cmd)
+@@ -438,6 +438,9 @@ void CWebServerBase::Send_DownloadFile_Cmd(wxString file_hash, wxString cmd, uin
+ 			hashtag.AddTag(CECTag(EC_TAG_PARTFILE_PRIO,
+ 				GetLowerPrio(file->lFilePrio, file->bFileAutoPriority)));
+ 		}
++	} else if (cmd == "setcat") {
++		ec_cmd = new CECPacket(EC_OP_PARTFILE_SET_CAT);
++		hashtag.AddTag(CECTag(EC_TAG_PARTFILE_CAT, (uint8)opt_arg));
+ 	}
+ 
+ 	if ( ec_cmd ) {
+@@ -494,6 +497,9 @@ void CWebServerBase::Send_Server_Cmd(uint32 ip, uint16 port, wxString cmd)
  void CWebServerBase::Send_Search_Cmd(wxString search, wxString extention, wxString type,
  	EC_SEARCH_TYPE search_type, uint32 avail, uint32 min_size, uint32 max_size)
  {

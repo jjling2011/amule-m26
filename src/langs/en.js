@@ -65,6 +65,7 @@ export default {
         files: "Files",
     },
     download: {
+        move_to: "Move to",
         task_action: "Action",
         copy_success: "Copied to clipboard.",
         copy_fail: "Fail to copy to clipboard.",

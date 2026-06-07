@@ -80,7 +80,7 @@ onUnmounted(() => document.removeEventListener("click", handleClickOutside))
 }
 
 .arrow {
-    font-size: 0.8rem;
+    font-size: 0.7rem;
     color: var(--fg-color);
     transition: transform 0.3s;
     margin: 0;

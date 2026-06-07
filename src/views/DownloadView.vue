@@ -174,6 +174,28 @@ function countTotal() {
     return tasks.value?.downloads?.length || 0
 }
 
+const selectedCat = ref("0")
+async function setFileCatTo() {
+    const files = (sortedTasks.value || []).filter((d) => d.checked)
+    if (files.length < 1) {
+        window.dialogs.alert(t("download.please_select_tasks"))
+        return
+    }
+
+    try {
+        const cat = selectedCat.value || "0"
+        const req = { cmd: "SetDownloadFilesCat" }
+        for (let file of files) {
+            req[file.hash] = cat
+        }
+        const resp = await utils.query(req)
+        utils.log(`server:`, resp.msg)
+    } catch (err) {
+        window.dialogs.alert(err.message)
+    }
+    refreshUI()
+}
+
 let pullCtrl
 onMounted(async function () {
     await refreshUI()
@@ -220,6 +242,13 @@ onUnmounted(function () {
                 :menu-items="taskActions"
                 @action="handleTaskAction"
             />
+
+            <button @click="setFileCatTo">
+                {{ t("download.move_to") }}
+            </button>
+            <select v-model="selectedCat" class="select-category" style="margin-right: 1rem">
+                <option v-for="(item, index) in tasks.cats" :value="index">{{ item }}</option>
+            </select>
         </div>
     </div>
     <div class="table-header">

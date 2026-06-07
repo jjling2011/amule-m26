@@ -95,6 +95,9 @@ function handle_get_req($get)
     } elseif ($cmd == "DoDownloadFiles") {
         $msg = doDownloadFiles($get);
         response($true, $msg, "");
+    } elseif ($cmd == "SetDownloadFilesCat") {
+        $msg = setDownloadFilesCat($get);
+        response($true, $msg, "");
     } elseif ($cmd == "GetTasks") {
         $data = array(
             "cats" => amule_get_categories(),
@@ -170,6 +173,21 @@ function doDownloadFiles($get)
         }
     }
     $msg = "add " . $c . " download tasks to " . $cat . ".";
+    return $msg;
+}
+
+function setDownloadFilesCat($get)
+{
+    $c = 0;
+    $cat = "";
+    foreach ($get as $maybe_hash => $tcat) {
+        if (m26_is_hash($maybe_hash)) {
+            $c++;
+            $cat = $tcat + 0;
+            amule_do_download_cmd($maybe_hash, "setcat", $cat);
+        }
+    }
+    $msg = "set " . $c . " download tasks to " . $cat . ".";
     return $msg;
 }
 
@@ -435,8 +453,9 @@ function calc_task_hash()
     $hash = 0;
     foreach ($files as $obj) {
         $hash = m26_hash($obj->hash, $hash);
-        $size_s = "" . $obj->size_done;
-        $hash = m26_hash($size_s, $hash);
+        $attrs = $obj->size_done . ", " . $obj->category . ", ";
+        $attrs .= $obj->prio . ", " . $obj->prio_auto . ", " . $obj->status;
+        $hash = m26_hash($attrs, $hash);
     }
     return $hash;
 }

@@ -65,6 +65,7 @@ export default {
         files: "文件数",
     },
     download: {
+        move_to: "移动至",
         task_action: "操作",
         copy_success: "已复制",
         copy_fail: "复制失败",
