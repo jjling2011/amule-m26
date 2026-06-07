@@ -133,6 +133,9 @@ jobs:
           # 临时推送到带后缀的 tag，如 ghcr.io/user/repo:main-amd64
           tags: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.ref_name }}-${{ matrix.arch }}
           push: true
+          cache-from: type=gha
+          # type=gha handles the API writes safely, but if it fails, it won't break your build
+          cache-to: type=gha,mode=max
 
   # === 第二阶段：等待所有平台构建完毕，融合成一个 Manifest ===
   merge-manifests:
