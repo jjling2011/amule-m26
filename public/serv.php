@@ -59,6 +59,9 @@ function handle_get_req($get)
         $port = $get["port"];
         amule_do_server_cmd($ip, $port, "connect");
         response($true, "done", "");
+    } elseif ($cmd == "AddServer") {
+        $msg = doAddEd2kServer($get);
+        response($true, $msg, "");
     } elseif ($cmd == "DisconnectServer") {
         amule_server_disconnect();
         response($true, "done", "");
@@ -110,7 +113,16 @@ function handle_get_req($get)
     }
 }
 
-function doApplyPrefs($get){
+function doAddEd2kServer($get) {
+    $ip = $get["ip"];
+    $port = $get["port"];
+    $name = $get["name"];
+    amule_do_add_server_cmd($ip, $port, $name);
+    $msg = "add ".$ip.":".$port." as ".$name;
+    return $msg;
+}
+
+function doApplyPrefs($get) {
     $webserver_opts = array("use_gzip", "autorefresh_time");
     $file_opts = array(
         "ich_en", "aich_trust",

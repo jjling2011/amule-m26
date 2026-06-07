@@ -48,7 +48,9 @@ export default {
     },
     servers: {
         invalid_ipv4: "无效的 IPv4 地址",
-        bootstrap: "引导",
+        bootstrap_kad: "引导 KAD",
+        add_new_server: "添加服务器",
+        require_three_param: "需要提供 3 个参数。",
         connect: "连接",
         disconnect_server: "断开服务器连接",
         disconnect_kad: "断开 KAD 连接",

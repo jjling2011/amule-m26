@@ -214,7 +214,7 @@ if(!m26_startswith("amule-m26", "".$ver)){
     echo "This web UI require amule-m26 backend.\n";
     
     echo "</pre>";
-    echo '<a href="https://github.com/jjling2011/amule-m26/">amule-m26</a>';
+    echo '<a href="https://github.com/jjling2011/amule-m26/">https://github.com/jjling2011/amule-m26/</a>';
 }
 ?>
     <div id="dialog-prompt"

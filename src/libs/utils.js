@@ -60,7 +60,7 @@ function query(data, url, timeout, method) {
 }
 
 function isIPv4Addr(s) {
-    if (!s || typeof s !== "string") {
+    if (!s || typeof s !== "string" || s.startsWith("0.0.0.0:")) {
         return false
     }
     return /^(\d{1,3}\.){3,3}\d{1,3}:\d{1,5}$/.test(s)

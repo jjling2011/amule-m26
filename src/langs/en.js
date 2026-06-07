@@ -48,7 +48,9 @@ export default {
     },
     servers: {
         invalid_ipv4: "Invalide IPv4 address",
-        bootstrap: "Bootstrap",
+        bootstrap_kad: "Bootstrap KAD",
+        add_new_server: "Add Server",
+        require_three_param: "Require 3 params.",
         connect: "Connect",
         disconnect_server: "Disconnect Server",
         disconnect_kad: "Disconnect KAD",

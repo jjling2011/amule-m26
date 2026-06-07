@@ -39,19 +39,17 @@ async function disconnectServer() {
     }
 }
 
-async function removeServer(event, ip, port) {
-    const span = window.$(event.currentTarget)
-    const line = span.parent().parent().parent()
-
+async function removeServer(ip, port) {
     const msg = t("servers.confirmRemoveServer")
     const ok = await window.dialogs.confirm(msg)
     if (!ok) {
         return
     }
-    line.hide()
+
     try {
         utils.log(`try to remove: [${ip}:${port}]`)
         await utils.query({ cmd: "RemoveServer", ip, port })
+        refreshUI()
     } catch (err) {
         window.dialogs.alert(err.message)
     }
@@ -97,6 +95,33 @@ const sortedServers = computed(() => {
     r.sort(comparer)
     return r
 })
+
+const new_server_param = ref("")
+async function addNewServer() {
+    const ps = (new_server_param.value || "").split(/[: ]/)
+    if (ps.length < 3) {
+        window.dialogs.alert(t("servers.require_three_param"))
+        return
+    }
+
+    const ip = ps[0]
+    const port = ps[1]
+    if (!utils.isIPv4Addr(`${ip}:${port}`)) {
+        window.dialogs.alert(t("servers.invalid_ipv4"))
+        return
+    }
+
+    const name = ps.slice(2).join(" ")
+    const req = { cmd: "AddServer", ip, port, name }
+    try {
+        const response = await utils.query(req)
+        const msg = response.msg
+        utils.log(`server: ${msg}`)
+        refreshUI()
+    } catch (err) {
+        window.dialogs.alert(err.message)
+    }
+}
 
 const kad_bootstrap_param = ref("")
 async function bootstrapKAD() {
@@ -192,13 +217,13 @@ onUnmounted(function () {
 <template>
     <div class="toolbar">
         <div class="toolstrip">
-            <i class="fa fa-sort-alpha-asc" aria-hidden="true"></i>
-            <select v-model="sortTag">
+            <i class="fa fa-sort-alpha-asc minor-el" aria-hidden="true"></i>
+            <select v-model="sortTag" class="minor-el">
                 <option value="name">{{ t("servers.name") }}</option>
                 <option value="users">{{ t("servers.users") }}</option>
                 <option value="files">{{ t("servers.files") }}</option>
             </select>
-            <select v-model="sortOrder" style="margin-right: 1rem">
+            <select v-model="sortOrder" class="minor-el" style="margin-right: 1rem">
                 <option value="ascending">{{ t("app.ascending") }}</option>
                 <option value="descending">{{ t("app.descending") }}</option>
             </select>
@@ -210,10 +235,14 @@ onUnmounted(function () {
                 @action="handleConnectAction"
             />
 
-            <span>KAD</span>
             <input v-model="kad_bootstrap_param" class="kad-param" placeholder="URL, IPv4:port" />
             <button @click="bootstrapKAD()" style="margin-right: 1rem">
-                {{ t("servers.bootstrap") }}
+                {{ t("servers.bootstrap_kad") }}
+            </button>
+
+            <input v-model="new_server_param" class="kad-param" placeholder="IPv4:port serv_name" />
+            <button @click="addNewServer()" style="margin-right: 1rem">
+                {{ t("servers.add_new_server") }}
             </button>
         </div>
     </div>
@@ -246,10 +275,7 @@ onUnmounted(function () {
                     >
                         <i class="fa fa-plug" aria-hidden="true"></i>
                     </button>
-                    <button
-                        @click="removeServer($event, item.ip, item.port)"
-                        :title="t('servers.remove')"
-                    >
+                    <button @click="removeServer(item.ip, item.port)" :title="t('servers.remove')">
                         <i class="fa fa-trash" aria-hidden="true"></i>
                     </button>
                 </div>
@@ -312,6 +338,10 @@ onUnmounted(function () {
     .toolbar,
     .table-header {
         left: 5rem;
+    }
+
+    .minor-el {
+        display: none;
     }
 
     .server-name-col {
