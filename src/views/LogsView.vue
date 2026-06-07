@@ -24,8 +24,11 @@ const curLogText = computed(() => {
         })
     }
     const log = allLogs.value[cat]
-    const log_hr = efixer.autoFixString(log)
-    return log_hr
+    if (cat !== "amule") {
+        return log
+    }
+    const lines = (log || "").split(/[\r\n]/).map((s) => efixer.autoFixString(s))
+    return lines.join("\n")
 })
 
 function onTextareaScroll() {
@@ -92,7 +95,12 @@ onUnmounted(function () {
         <span style="flex-grow: 1">{{ logType }}</span>
     </div>
     <div class="container">
-        <textarea ref="textareaRef" v-model="curLogText" @scroll="onTextareaScroll"></textarea>
+        <textarea
+            ref="textareaRef"
+            v-model="curLogText"
+            @scroll="onTextareaScroll"
+            spellcheck="false"
+        ></textarea>
     </div>
 </template>
 

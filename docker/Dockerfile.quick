@@ -1,4 +1,4 @@
-FROM ghcr.nju.edu.cn/jjling2011/amule-m26:v0.1.1
+FROM ghcr.nju.edu.cn/jjling2011/amule-m26:v0.1.3
 
 # Add M26 web UI
 COPY dist/M26/ /usr/share/amule/webserver/M26/

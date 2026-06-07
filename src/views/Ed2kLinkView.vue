@@ -82,7 +82,7 @@ onUnmounted(function () {
         <span style="flex-grow: 1">{{ t("ed2k.links") }} ({{ countLinks() }})</span>
     </div>
     <div class="container">
-        <textarea v-model="link_text" placeholder="ed2k://..."></textarea>
+        <textarea v-model="link_text" placeholder="ed2k://..." spellcheck="false"></textarea>
     </div>
 </template>
 
