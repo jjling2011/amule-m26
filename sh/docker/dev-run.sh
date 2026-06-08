@@ -28,6 +28,7 @@ sudo docker run \
     --name="${name}" \
     --rm \
     -p 127.0.0.1:4401:4711 \
+    -p 127.0.0.1:4402:4712 \
     -e PUID=1000 \
     -e PGID=1000 \
     -e TZ=Asia/Shanghai \

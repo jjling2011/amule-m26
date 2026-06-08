@@ -83,9 +83,9 @@ onMounted(function () {
 
 <template>
     <div class="side-bar">
-        <div class="logo-bar">
+        <div class="logo-bar" @click="onAppNameClick()" style="cursor: pointer">
             <img src="/favicon.ico" alt="logo.ico" />
-            <span @click="onAppNameClick()" style="cursor: pointer">Amule M26</span>
+            <span>Amule M26</span>
         </div>
         <nav class="nav-bar">
             <RouterLink to="/">

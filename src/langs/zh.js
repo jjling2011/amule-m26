@@ -19,9 +19,6 @@ export default {
         logs: "日志",
         about: "关于",
     },
-    about: {
-        stats: "统计信息",
-    },
     dialogs: {
         ok: "确定",
         cancel: "取消",
@@ -128,6 +125,37 @@ export default {
                 use_gzip: "Use gzip compression",
                 autorefresh_time: "Page refresh interval",
             },
+            servers: {
+                add_from_server: "Add server from connected server",
+                add_from_client: "Add server from connected client",
+            },
         },
+    },
+    about: {
+        stats: "Stats.",
+        note: `过滤用法:
+hello    名称含 "hello"
+-world   名称没有 "world"
+^hello   名称开头是 "hello"
+-^world  名称开关不是 "world"
+{'@'}        选中的
+>10      大小大于 10 MiB
+<200     大小小于 200 MiB
+
+过滤关键字使用空格分隔。
+
+
+提示:
+点击 logo 回到列表顶部。
+
+GitHub:
+https://github.com/jjling2011/amule-m26/
+
+Credits:
+https://github.com/ngosang/docker-amule/
+https://github.com/MatteoRagni/AmuleWebUI-Reloaded/
+https://github.com/amule-project/
+
+2026-06`,
     },
 }

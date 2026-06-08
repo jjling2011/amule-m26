@@ -1,6 +1,9 @@
 <script setup>
 const githubUrl = "https://github.com/jjling2011/amule-m26/"
 const dockerUrl = "https://github.com/jjling2011/amule-m26/pkgs/container/amule-m26"
+import { useI18n } from "vue-i18n"
+
+const { t } = useI18n()
 
 function goto(url) {
     window.open(url, "_blank")
@@ -18,32 +21,7 @@ function goto(url) {
         <!-- pass -->
     </div>
     <div class="container">
-        <pre class="about-content">
-Filter:
-hello    include string "hello"
--world   without string "world"
-^hello   starts with "hello"
--^world  not starts with "world"
-@        selected
->10      size bigger than 10 MiB
-&lt;200     size smaller than 200 MiB
-
-Filter keywords are seperated by space.
-
-
-Tips:
-Click app logo to scroll to top.
-
-GitHub:
-https://github.com/jjling2011/amule-m26/
-
-Credits:
-https://github.com/ngosang/docker-amule/
-https://github.com/MatteoRagni/AmuleWebUI-Reloaded/
-https://github.com/amule-project/
-
-2026-06
-        </pre>
+        <pre class="about-content">{{ t("about.note") }}</pre>
     </div>
 </template>
 

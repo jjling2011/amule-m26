@@ -59,6 +59,52 @@ index 1ddafac43..c6f318b3b 100644
  		sURL += (sURL.Find('?') != wxNOT_FOUND ? "&" : "?") + sData.Left(dwDataLen);
  	}
  
+diff --git a/src/webserver/src/php_amule_lib.cpp b/src/webserver/src/php_amule_lib.cpp
+index 949369fe0..68dce56ab 100644
+--- a/src/webserver/src/php_amule_lib.cpp
++++ b/src/webserver/src/php_amule_lib.cpp
+@@ -415,6 +415,12 @@ PHP_2_EC_OPT_DEF g_coretweak_opt_defs[] = {
+ 	{0, (ECTagNames)0, 0}
+ };
+ 
++PHP_2_EC_OPT_DEF g_servers_opt_defs[] = {
++	{ "add_from_server", EC_TAG_SERVERS_ADD_FROM_SERVER, 0},
++	{ "add_from_client", EC_TAG_SERVERS_ADD_FROM_CLIENT, 0},
++	{0, (ECTagNames)0, 0}
++};
++
+ void set_array_int_val(PHP_VALUE_NODE *array, const std::string &arrkey, int value)
+ {
+ 	PHP_VAR_NODE *key = array_get_by_str_key(array, arrkey);
+@@ -477,6 +483,13 @@ void php_get_amule_options(PHP_VALUE_NODE *result)
+ 		ec_tag_2_php(cattag, g_file_opt_defs, cat);
+ 	}
+ 
++	if ((cattag = reply->GetTagByName(EC_TAG_PREFS_SERVERS)) != 0) {
++		PHP_VAR_NODE *cat = array_get_by_str_key(result, "servers");
++		cast_value_array(&cat->value);
++
++		ec_tag_2_php(cattag, g_servers_opt_defs, cat);
++	}
++
+ 	if ((cattag = reply->GetTagByName(EC_TAG_PREFS_REMOTECTRL)) != 0) {
+ 		PHP_VAR_NODE *cat = array_get_by_str_key(result, "webserver");
+ 		cast_value_array(&cat->value);
+@@ -550,6 +563,14 @@ void php_set_amule_options(PHP_VALUE_NODE *)
+ 		php_2_ec_tag(&connPrefs, g_connection_opt_defs, &opt_group_array->value);
+ 		req.AddTag(connPrefs);
+ 	}
++
++	opt_group_array = array_get_by_str_key(&si->var->value, "servers");
++	if ( opt_group_array->value.type == PHP_VAL_ARRAY ) {
++		CECEmptyTag serversPrefs(EC_TAG_PREFS_SERVERS);
++		php_2_ec_tag(&serversPrefs, g_servers_opt_defs, &opt_group_array->value);
++		req.AddTag(serversPrefs);
++	}
++
+ 	// webserver
+ 	opt_group_array = array_get_by_str_key(&si->var->value, "webserver");
+ 	if ( opt_group_array->value.type == PHP_VAL_ARRAY ) {
 diff --git a/src/webserver/src/php_core_lib.cpp b/src/webserver/src/php_core_lib.cpp
 index 95498d378..f3d1e6c59 100644
 --- a/src/webserver/src/php_core_lib.cpp

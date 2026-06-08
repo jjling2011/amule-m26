@@ -124,6 +124,7 @@ function doAddEd2kServer($get) {
 
 function doApplyPrefs($get) {
     $webserver_opts = array("use_gzip", "autorefresh_time");
+    $servers_opts = array("add_from_server", "add_from_client");
     $file_opts = array(
         "ich_en", "aich_trust",
         "new_files_paused", "new_files_auto_dl_prio", "new_files_auto_ul_prio",
@@ -148,6 +149,10 @@ function doApplyPrefs($get) {
     foreach ($webserver_opts as $i) {
         $curr_value = $get[$i];
         $all_opts["webserver"][$i] = $curr_value;
+    }
+     foreach ($servers_opts as $i) {
+        $curr_value = $get[$i];
+        $all_opts["servers"][$i] = $curr_value;
     }
 
     // general: nickname is a single top-level string, not nested.

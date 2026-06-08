@@ -19,9 +19,6 @@ export default {
         logs: "Logs",
         about: "About",
     },
-    about: {
-        stats: "Stats.",
-    },
     dialogs: {
         ok: "Ok",
         cancel: "Cancel",
@@ -128,6 +125,37 @@ export default {
                 use_gzip: "Use gzip compression",
                 autorefresh_time: "Page refresh interval",
             },
+            servers: {
+                add_from_server: "Add server from connected server",
+                add_from_client: "Add server from connected client",
+            },
         },
+    },
+    about: {
+        stats: "Stats.",
+        note: `Filter:
+hello    include string "hello"
+-world   without string "world"
+^hello   starts with "hello"
+-^world  not starts with "world"
+{'@'}        selected
+>10      size bigger than 10 MiB
+<200     size smaller than 200 MiB
+
+Filter keywords are seperated by space.
+
+
+Tips:
+Click app logo to scroll to top.
+
+GitHub:
+https://github.com/jjling2011/amule-m26/
+
+Credits:
+https://github.com/ngosang/docker-amule/
+https://github.com/MatteoRagni/AmuleWebUI-Reloaded/
+https://github.com/amule-project/
+
+2026-06`,
     },
 }

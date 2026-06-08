@@ -90,6 +90,10 @@ const ctrl_checkbox = {
     coretweaks: {
         max_conn_5sec: 20,
     },
+    servers: {
+        add_from_server: true,
+        add_from_client: true,
+    },
 }
 
 const prefs = ref({})
