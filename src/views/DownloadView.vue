@@ -54,7 +54,7 @@ function switchSortKeyTo(key) {
     }
 }
 
-const filterSubStr = ref("")
+const filterKeyword = ref("")
 
 const sortedTasks = computed((prev) => {
     const trigger_recompute = triggerRef.value
@@ -64,11 +64,14 @@ const sortedTasks = computed((prev) => {
     const cats = tasks.value.cats || []
 
     const r = []
-    const sub_str = utils.stripSpace(filterSubStr.value)
+    const filters = utils.buildFilters(filterKeyword.value)
     for (let file of files) {
         const name_hr = efixer.autoFixString(file.name)
-        if (!sub_str || utils.subStrIn(sub_str, name_hr)) {
-            r.push(transform(file, cur_selected, name_hr, cats))
+        if (!filters.textf(name_hr)) {
+            const t = transform(file, cur_selected, name_hr, cats)
+            if (!filters.condf(t.checked) && !filters.sizef(t.size)) {
+                r.push(t)
+            }
         }
     }
 
@@ -222,8 +225,8 @@ onUnmounted(function () {
             <input
                 style="width: 10rem; margin-right: 1rem"
                 class="task-subtle-col"
-                v-model="filterSubStr"
-                :placeholder="t('app.filter') + '(' + t('download.name') + ')'"
+                v-model="filterKeyword"
+                :placeholder="t('app.filter')"
             />
 
             <DropdownButton

@@ -22,7 +22,7 @@ function onSelectAllChange() {
 //#region computed
 const sortTag = compos.useLocalStorage("m26-search-sort-tag", "none")
 const sortOrder = compos.useLocalStorage("m26-search-sort-ordering", "descending")
-const filterSubStr = ref("")
+const filterKeyword = ref("")
 
 function getOrderSign(name) {
     if (name !== sortTag.value) {
@@ -48,12 +48,14 @@ const orderedModel = computed((prev) => {
     const dlHashes = (dataModel.value?.download || []).map((d) => d.hash)
 
     const r = []
-    const sub_str = utils.stripSpace(filterSubStr.value)
+    const filters = utils.buildFilters(filterKeyword.value)
     for (let file of files) {
         const name_hr = efixer.autoFixString(file.name)
-        if (!sub_str || utils.subStrIn(sub_str, name_hr)) {
-            const f = transform(file, cur_selected, name_hr, dlHashes)
-            r.push(f)
+        if (!filters.textf(name_hr)) {
+            const t = transform(file, cur_selected, name_hr, dlHashes)
+            if (!filters.sizef(t.size) && !filters.condf(t.checked)) {
+                r.push(t)
+            }
         }
     }
 
@@ -222,11 +224,7 @@ onUnmounted(function () {
                 <option v-for="(item, index) in cats" :value="index">{{ item }}</option>
             </select>
 
-            <input
-                id="filter-input"
-                v-model="filterSubStr"
-                :placeholder="t('app.filter') + '(' + t('search.name') + ')'"
-            />
+            <input id="filter-input" v-model="filterKeyword" :placeholder="t('app.filter')" />
         </div>
     </div>
     <div class="table-header">

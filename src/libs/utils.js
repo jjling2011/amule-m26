@@ -59,6 +59,89 @@ function query(data, url, timeout, method) {
     })
 }
 
+function buildFilters(keyword) {
+    const emptyConds = ["-", ">", "<"]
+    const keywords = (keyword || "").split(/ /).filter((s) => s && emptyConds.indexOf(s) < 0)
+
+    const condf = keywords.indexOf("@") < 0 ? () => false : (c) => !c
+
+    const min = Math.max(
+        ...keywords.filter((s) => s.startsWith(">")).map((s) => parseInt(s.substring(1)) || -1),
+    )
+    const max = Math.min(
+        ...keywords
+            .filter((s) => s.startsWith("<"))
+            .map((s) => parseInt(s.substring(1)) || Number.MAX_SAFE_INTEGER),
+    )
+
+    function sizef(size) {
+        size = size / 1024 / 1024
+        return size > max || size < min
+    }
+
+    const has_cand = keywords
+        .filter((s) => emptyConds.indexOf(s.substring(0, 1)) < 0)
+        .map((s) => s.toLowerCase())
+    const starts = has_cand
+        .filter((s) => s.substring(0, 1) === "^")
+        .map((s) => s.substring(1))
+        .filter((s) => s)
+    const has = has_cand.filter((s) => s.substring(0, 1) !== "^")
+
+    const not_cand = keywords
+        .filter((s) => s.startsWith("-"))
+        .map((s) => s.substring(1))
+        .map((s) => s.toLowerCase())
+
+    const not_starts = not_cand
+        .filter((s) => s.substring(0, 1) === "^")
+        .map((s) => s.substring(1))
+        .filter((s) => s)
+    const not_has = not_cand.filter((s) => s.substring(0, 1) !== "^")
+
+    // log(`has:`, has, `starts:`, starts)
+    // log(`not has:`, not_has, `not starts:`, not_starts)
+
+    function textf(s) {
+        s = (s || "").toLowerCase()
+        for (let kw of starts) {
+            if (!s.startsWith(kw)) {
+                return true
+            }
+        }
+
+        for (let kw of not_starts) {
+            if (s.startsWith(kw)) {
+                return true
+            }
+        }
+
+        for (let kw of has) {
+            const found = s.includes(kw)
+            if (!found) {
+                return true
+            }
+        }
+
+        for (let kw of not_has) {
+            const found = s.includes(kw)
+            if (found) {
+                return true
+            }
+        }
+        return false
+    }
+    // log(`condf(false): ${condf(false)}`)
+    // log(`min: ${min}, max: ${max}, sizef(10): ${sizef(10)}`)
+    // log(`has: ${formatJson(has)}, hasnot: ${formatJson(hasnot)}, textf("hello"): ${textf("hello")}`)
+
+    return {
+        sizef,
+        condf,
+        textf,
+    }
+}
+
 function isIPv4Addr(s) {
     if (!s || typeof s !== "string" || s.startsWith("0.0.0.0:")) {
         return false
@@ -322,6 +405,7 @@ export default {
     formatJson,
     formatJsonKeys,
     subStrIn,
+    buildFilters,
     stripSpace,
     compareString,
     sortInPlace,
