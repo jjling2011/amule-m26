@@ -1,8 +1,8 @@
 diff --git a/src/webserver/src/WebServer.cpp b/src/webserver/src/WebServer.cpp
-index f8c65bd05..e2d07ecbc 100644
+index 046dd39ab..bf1feec8a 100644
 --- a/src/webserver/src/WebServer.cpp
 +++ b/src/webserver/src/WebServer.cpp
-@@ -438,6 +438,9 @@ void CWebServerBase::Send_DownloadFile_Cmd(wxString file_hash, wxString cmd, uin
+@@ -440,6 +440,9 @@ void CWebServerBase::Send_DownloadFile_Cmd(wxString file_hash, wxString cmd, uin
  			hashtag.AddTag(CECTag(EC_TAG_PARTFILE_PRIO,
  				GetLowerPrio(file->lFilePrio, file->bFileAutoPriority)));
  		}
@@ -12,7 +12,7 @@ index f8c65bd05..e2d07ecbc 100644
  	}
  
  	if ( ec_cmd ) {
-@@ -494,6 +497,9 @@ void CWebServerBase::Send_Server_Cmd(uint32 ip, uint16 port, wxString cmd)
+@@ -496,6 +499,9 @@ void CWebServerBase::Send_Server_Cmd(uint32 ip, uint16 port, wxString cmd)
  void CWebServerBase::Send_Search_Cmd(wxString search, wxString extention, wxString type,
  	EC_SEARCH_TYPE search_type, uint32 avail, uint32 min_size, uint32 max_size)
  {
@@ -23,10 +23,10 @@ index f8c65bd05..e2d07ecbc 100644
  	search_req.AddTag(CEC_Search_Tag (search, search_type,
  		type, extention, avail, min_size, max_size));
 diff --git a/src/webserver/src/WebServer.h b/src/webserver/src/WebServer.h
-index 69ae79e7c..a16dc26b9 100644
+index ee7e94efe..f6c4961f0 100644
 --- a/src/webserver/src/WebServer.h
 +++ b/src/webserver/src/WebServer.h
-@@ -438,6 +438,10 @@ class SearchInfo : public UpdatableItemsContainer<SearchFile, CEC_SearchFile_Tag
+@@ -444,6 +444,10 @@ class SearchInfo : public UpdatableItemsContainer<SearchFile, CEC_SearchFile_Tag
  
  		SearchInfo(CamulewebApp *webApp);
  
@@ -38,19 +38,19 @@ index 69ae79e7c..a16dc26b9 100644
  
  };
 diff --git a/src/webserver/src/WebSocket.cpp b/src/webserver/src/WebSocket.cpp
-index 1ddafac43..c6f318b3b 100644
+index f291be87e..87fcb09e0 100644
 --- a/src/webserver/src/WebSocket.cpp
 +++ b/src/webserver/src/WebSocket.cpp
-@@ -182,7 +182,7 @@ void CWebSocket::OnRequestReceived(char* pHeader, char* pData, uint32 dwDataLen)
+@@ -189,7 +189,7 @@ void CWebSocket::OnRequestReceived(char* pHeader, char* pData, uint32 dwDataLen)
  	}
  	*pHeader++ = 0;
  
 -	wxString sURL(char2unicode(path));
 +	wxString sURL = wxString::FromUTF8(path);
- 	if ( is_post ) {
- 		// Append the POST body to the URL so CParsedUrl picks up the
- 		// form fields the same way it does for GET-style ?key=value
-@@ -192,7 +192,7 @@ void CWebSocket::OnRequestReceived(char* pHeader, char* pData, uint32 dwDataLen)
+ 	// Capture the URL exactly as it was on the wire, before any
+ 	// POST-body concatenation below. The login handler in
+ 	// CScriptWebServer::ProcessURL needs to be able to distinguish
+@@ -207,7 +207,7 @@ void CWebSocket::OnRequestReceived(char* pHeader, char* pData, uint32 dwDataLen)
  		// truncates the first key's value to `b?pass=XYZ` and never
  		// registers a `pass` entry, breaking POST login on any URL
  		// that wasn't query-less (issue #724).
@@ -60,7 +60,7 @@ index 1ddafac43..c6f318b3b 100644
  	}
  
 diff --git a/src/webserver/src/php_amule_lib.cpp b/src/webserver/src/php_amule_lib.cpp
-index 949369fe0..68dce56ab 100644
+index acc06f880..8959217f2 100644
 --- a/src/webserver/src/php_amule_lib.cpp
 +++ b/src/webserver/src/php_amule_lib.cpp
 @@ -415,6 +415,12 @@ PHP_2_EC_OPT_DEF g_coretweak_opt_defs[] = {
@@ -106,7 +106,7 @@ index 949369fe0..68dce56ab 100644
  	opt_group_array = array_get_by_str_key(&si->var->value, "webserver");
  	if ( opt_group_array->value.type == PHP_VAL_ARRAY ) {
 diff --git a/src/webserver/src/php_core_lib.cpp b/src/webserver/src/php_core_lib.cpp
-index 95498d378..f3d1e6c59 100644
+index 51e4f3e35..f6cc990bc 100644
 --- a/src/webserver/src/php_core_lib.cpp
 +++ b/src/webserver/src/php_core_lib.cpp
 @@ -453,7 +453,313 @@ void php_native_ngettext(PHP_VALUE_NODE *result)
