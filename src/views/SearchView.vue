@@ -20,13 +20,6 @@ function onSelectAllChange() {
 //#endregion
 
 //#region computed
-const comparers = {
-    checked: (c) => (a, b) => c(a.checked - b.checked),
-    name: (c) => (a, b) => c(utils.compareString(a.name_hr, b.name_hr)),
-    size: (c) => (a, b) => c(a.size - b.size),
-    sources: (c) => (a, b) => c(a.sources - b.sources),
-}
-
 const sortTag = compos.useLocalStorage("m26-search-sort-tag", "none")
 const sortOrder = compos.useLocalStorage("m26-search-sort-ordering", "descending")
 const filterSubStr = ref("")
@@ -64,11 +57,11 @@ const orderedModel = computed((prev) => {
         }
     }
 
-    const st = sortTag.value
-    if (st && st !== "none") {
-        const reverse = sortOrder.value === "descending" ? (cond) => -1 * cond : (cond) => cond
-        const comparer = utils.getValue(comparers, sortTag.value, "sources")(reverse)
-        r.sort(comparer)
+    const sortKey = sortTag.value || "none"
+    if (sortKey !== "none") {
+        const strKeys = ["name_hr"]
+        const isNumKey = strKeys.indexOf(sortKey) < 0
+        utils.sortInPlace(r, sortKey, isNumKey, sortOrder.value === "descending")
     }
     setTimeout(() => countSelected(), 500)
     return r
@@ -199,10 +192,9 @@ onUnmounted(function () {
         <div class="toolstrip">
             <i class="fa fa-sort-alpha-asc" aria-hidden="true"></i>
             <select v-model="sortTag" class="select-sort-tag">
-                <option value="checked">{{ t("app.selected") }}</option>
                 <option value="size">{{ t("search.size") }}</option>
                 <option value="sources">{{ t("search.sources") }}</option>
-                <option value="name">{{ t("search.name") }}</option>
+                <option value="name_hr">{{ t("search.name") }}</option>
                 <option value="none">{{ t("search.none") }}</option>
             </select>
             <select v-model="sortOrder" class="select-sort-direction" style="margin-right: 1rem">
@@ -249,13 +241,18 @@ onUnmounted(function () {
         <span style="width: 5rem; flex-shrink: 0; cursor: pointer" @click="switchSortKeyTo('size')"
             >{{ t("search.size") }}{{ getOrderSign("size") }}</span
         >
-        <span style="flex-grow: 1; cursor: pointer" @click="switchSortKeyTo('name')"
-            >{{ t("search.name") }}{{ getOrderSign("name") }} ({{ selectedModelCount }} /
+        <span style="flex-grow: 1; cursor: pointer" @click="switchSortKeyTo('name_hr')"
+            >{{ t("search.name") }}{{ getOrderSign("name_hr") }} ({{ selectedModelCount }} /
             {{ countTotal() }})</span
         >
     </div>
     <div class="container">
-        <div v-for="(item, index) in orderedModel" :key="index" class="table-row">
+        <div
+            v-for="(item, index) in orderedModel"
+            :key="index"
+            class="table-row"
+            :style="{ 'font-weight': item.checked ? 'bold' : 'unset' }"
+        >
             <label class="table-label" style="cursor: pointer">
                 <input
                     type="checkbox"

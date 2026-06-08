@@ -36,17 +36,6 @@ function onSelectAllChange() {
     triggerRef.value++
 }
 
-const comparers = {
-    name: (c) => (a, b) => c(utils.compareString(a.name_hr, b.name_hr)),
-    cat: (c) => (a, b) => c(utils.compareString(a.cat_hr, b.cat_hr)),
-    size: (c) => (a, b) => c(a.size - b.size),
-    speed: (c) => (a, b) => c(a.speed - b.speed),
-    prio: (c) => (a, b) => c(utils.compareString(a.prio, b.prio)),
-    status: (c) => (a, b) => c(utils.compareString(a.status, b.status)),
-    complete: (c) => (a, b) => c(a.complete - b.complete),
-    selected: (c) => (a, b) => c(a.checked - b.checked),
-}
-
 const sortTag = compos.useLocalStorage("m26-download-sort-tag", "size")
 const sortOrder = compos.useLocalStorage("m26-download-sort-order", "descending")
 
@@ -74,9 +63,6 @@ const sortedTasks = computed((prev) => {
     const files = tasks.value.downloads || []
     const cats = tasks.value.cats || []
 
-    const reverse = sortOrder.value === "descending" ? (cond) => -1 * cond : (cond) => cond
-    const comparer = utils.getValue(comparers, sortTag.value, "name")(reverse)
-
     const r = []
     const sub_str = utils.stripSpace(filterSubStr.value)
     for (let file of files) {
@@ -85,7 +71,12 @@ const sortedTasks = computed((prev) => {
             r.push(transform(file, cur_selected, name_hr, cats))
         }
     }
-    r.sort(comparer)
+
+    const sortKey = sortTag.value || "name_hr"
+    const strKeys = ["name_hr", "cat_hr", "prio", "status"]
+    const isNumKey = strKeys.indexOf(sortKey) < 0
+    utils.sortInPlace(r, sortKey, isNumKey, sortOrder.value === "descending")
+
     setTimeout(() => countSelected(), 500)
     return r
 })
@@ -215,9 +206,8 @@ onUnmounted(function () {
         <div class="toolstrip">
             <i class="fa fa-sort-alpha-asc" aria-hidden="true"></i>
             <select v-model="sortTag">
-                <option value="selected">{{ t("app.selected") }}</option>
-                <option value="name">{{ t("download.name") }}</option>
-                <option value="cat">{{ t("download.cat") }}</option>
+                <option value="name_hr">{{ t("download.name") }}</option>
+                <option value="cat_hr">{{ t("download.cat") }}</option>
                 <option value="size">{{ t("download.size") }}</option>
                 <option value="complete">{{ t("download.complete") }}</option>
                 <option value="speed">{{ t("download.speed") }}</option>
@@ -255,12 +245,12 @@ onUnmounted(function () {
         <span style="width: 3rem">
             <input type="checkbox" v-model="selectAll" @change="onSelectAllChange" />
         </span>
-        <span style="flex-grow: 1; cursor: pointer" @click="switchSortKeyTo('name')"
-            >{{ t("download.name") }}{{ getOrderSign("name") }} ({{ selectedTaskCount }} /
+        <span style="flex-grow: 1; cursor: pointer" @click="switchSortKeyTo('name_hr')"
+            >{{ t("download.name") }}{{ getOrderSign("name_hr") }} ({{ selectedTaskCount }} /
             {{ countTotal() }})</span
         >
-        <span style="width: 6rem; cursor: pointer" @click="switchSortKeyTo('cat')"
-            >{{ t("download.cat") }}{{ getOrderSign("cat") }}</span
+        <span style="width: 6rem; cursor: pointer" @click="switchSortKeyTo('cat_hr')"
+            >{{ t("download.cat") }}{{ getOrderSign("cat_hr") }}</span
         >
         <span style="width: 5rem; cursor: pointer" @click="switchSortKeyTo('size')"
             >{{ t("download.size") }}{{ getOrderSign("size") }}</span
@@ -279,7 +269,12 @@ onUnmounted(function () {
         >
     </div>
     <div class="container">
-        <div class="table-row" v-for="(item, index) in sortedTasks" :key="index">
+        <div
+            class="table-row"
+            v-for="(item, index) in sortedTasks"
+            :key="index"
+            :style="{ 'font-weight': item.checked ? 'bold' : 'unset' }"
+        >
             <label class="table-col1" style="cursor: pointer">
                 <input
                     type="checkbox"

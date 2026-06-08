@@ -5,7 +5,6 @@ export default {
         filter: "过滤",
         ascending: "升序",
         descending: "降序",
-        selected: "选中",
     },
     theme: {
         title: "主题",

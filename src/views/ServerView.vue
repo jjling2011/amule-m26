@@ -64,12 +64,6 @@ async function refreshUI() {
     }
 }
 
-const comparers = {
-    name: (c) => (a, b) => c(utils.compareString(a.name, b.name)),
-    users: (c) => (a, b) => c(a.users - b.users),
-    files: (c) => (a, b) => c(a.files - b.files),
-}
-
 const sortTag = compos.useLocalStorage("m26-server-sort-tag", "files")
 const sortOrder = compos.useLocalStorage("m26-server-sort-order", "descending")
 
@@ -90,9 +84,9 @@ function switchSortKeyTo(key) {
 
 const sortedServers = computed(() => {
     const r = [...servers.value]
-    const reverse = sortOrder.value === "descending" ? (cond) => -1 * cond : (cond) => cond
-    const comparer = utils.getValue(comparers, sortTag.value, "files")(reverse)
-    r.sort(comparer)
+    const sortKey = sortTag.value || "files"
+    const isNumKey = sortKey !== "name"
+    utils.sortInPlace(r, sortKey, isNumKey, sortOrder.value === "descending")
     return r
 })
 
@@ -263,7 +257,12 @@ onUnmounted(function () {
         }}</span>
     </div>
     <div class="container">
-        <div class="table-row" v-for="(item, index) in sortedServers" :key="index">
+        <div
+            class="table-row"
+            v-for="(item, index) in sortedServers"
+            :key="index"
+            :style="{ 'font-weight': isConnected(item.address) ? 'bold' : 'unset' }"
+        >
             <span style="width: 6rem">
                 <span v-if="isConnected(item.address)">
                     {{ t("servers.active") }}

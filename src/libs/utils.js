@@ -282,6 +282,15 @@ function compareString(a, b) {
     return a.localeCompare(b, "en", { sensitivity: "base" })
 }
 
+function sortInPlace(list, key, isNumber, isDescending) {
+    const rev = isDescending ? (cond) => -1 * cond : (cond) => cond
+    const comp = isNumber
+        ? (d1, d2) => d1[key] - d2[key]
+        : (d1, d2) => compareString(d1[key], d2[key])
+    const mond = (d1, d2) => rev(comp(d1, d2))
+    list.sort(mond)
+}
+
 function getValue(dict, expKey, defKey) {
     return dict[expKey] || dict[defKey]
 }
@@ -315,6 +324,7 @@ export default {
     subStrIn,
     stripSpace,
     compareString,
+    sortInPlace,
     getValue,
     isIPv4Addr,
     parseIPv4Addr,

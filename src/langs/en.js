@@ -5,7 +5,6 @@ export default {
         filter: "Filter",
         ascending: "Asce",
         descending: "Desc",
-        selected: "Selected",
     },
     theme: {
         title: "Theme",
