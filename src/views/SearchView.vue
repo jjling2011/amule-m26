@@ -45,14 +45,14 @@ const orderedModel = computed((prev) => {
 
     const cur_selected = (prev || []).filter((d) => d.checked).map((d) => d.hash)
     const files = dataModel.value?.search || []
-    const dlHashes = (dataModel.value?.download || []).map((d) => d.hash)
+    const taskHashes = dataModel.value?.hashes || []
 
     const r = []
     const filters = utils.buildFilters(filterKeyword.value)
     for (let file of files) {
         const name_hr = efixer.autoFixString(file.name)
         if (!filters.textf(name_hr)) {
-            const t = transform(file, cur_selected, name_hr, dlHashes)
+            const t = transform(file, cur_selected, name_hr, taskHashes)
             if (!filters.sizef(t.size) && !filters.condf(t.checked)) {
                 r.push(t)
             }
@@ -99,11 +99,12 @@ function emptyDataModel() {
 async function refreshUI() {
     try {
         const rSearch = await utils.query({ cmd: "GetSearchResult" })
-        const rDownload = await utils.query({ cmd: "GetTasks" })
+        const rTaskHashes = await utils.query({ cmd: "GetAllTaskHashes" })
+        const hashes = Object.keys(rTaskHashes.data || {})
         const us = utils.uniqueByKey(rSearch.data || [], "hash")
         dataModel.value = {
             search: us,
-            download: rDownload.data.downloads || [],
+            hashes,
         }
     } catch (err) {
         window.dialogs.alert(err.message)
@@ -115,6 +116,7 @@ const searchNetwork = compos.useLocalStorage("m26-search-network", "global")
 async function doSearch() {
     const kw = searchKeyword.value
     utils.log(`search: ${kw}`)
+    filterKeyword.value = ""
     try {
         const resp = await utils.query({
             cmd: "DoSearch",

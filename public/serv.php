@@ -101,6 +101,9 @@ function handle_get_req($get)
     } elseif ($cmd == "SetDownloadFilesCat") {
         $msg = setDownloadFilesCat($get);
         response($true, $msg, "");
+    } elseif ($cmd == "GetAllTaskHashes") {
+        $data = getAllTaskHashes();
+        response($true, "", $data);
     } elseif ($cmd == "GetTasks") {
         $data = array(
             "cats" => amule_get_categories(),
@@ -111,6 +114,19 @@ function handle_get_req($get)
         $msg = "unknow cmd: '" . $cmd . "'";
         response($false, $msg, "");
     }
+}
+
+function getAllTaskHashes() {
+    $r;
+    $tasks = amule_load_vars("downloads");
+    foreach($tasks as $file) {
+        $r[$file->hash] = 1;
+    }
+    $shared = amule_load_vars("shared");
+    foreach($shared as $file) {
+        $r[$file->hash] = 1;
+    }
+    return $r;
 }
 
 function doAddEd2kServer($get) {
@@ -458,6 +474,10 @@ function calc_search_result_hash()
         $hash = m26_hash($obj->hash, $hash);
     }
     $files = amule_load_vars("downloads");
+    foreach ($files as $obj) {
+        $hash = m26_hash($obj->hash, $hash);
+    }
+    $files = amule_load_vars("shared");
     foreach ($files as $obj) {
         $hash = m26_hash($obj->hash, $hash);
     }
