@@ -69,7 +69,7 @@ const sortedTasks = computed((prev) => {
         const name_hr = efixer.autoFixString(file.name)
         if (!filters.textf(name_hr)) {
             const t = transform(file, cur_selected, name_hr, cats)
-            if (!filters.condf(t.checked) && !filters.sizef(t.size)) {
+            if (!filters.condf(t.checked) && !filters.sizef(t.size) && !filters.tagf(t.cat_hr)) {
                 r.push(t)
             }
         }

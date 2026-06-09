@@ -138,6 +138,8 @@ hello    include string "hello"
 -world   without string "world"
 ^hello   starts with "hello"
 -^world  not starts with "world"
+#music   category is "music"
+-#music  category is not "music"
 {'@'}        selected
 >10      size bigger than 10 MiB
 <200     size smaller than 200 MiB

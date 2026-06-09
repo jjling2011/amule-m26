@@ -138,9 +138,11 @@ hello    名称含 "hello"
 -world   名称没有 "world"
 ^hello   名称开头是 "hello"
 -^world  名称开关不是 "world"
+#music   在 "music" 分类里面
+-#music  不在 "music" 分类里面
 {'@'}        选中的
->10      大小大于 10 MiB
-<200     大小小于 200 MiB
+>10      大于 10 MiB
+<200     小于 200 MiB
 
 过滤关键字使用空格分隔。
 

@@ -60,7 +60,7 @@ function query(data, url, timeout, method) {
 }
 
 function buildFilters(keyword) {
-    const emptyConds = ["-", ">", "<"]
+    const emptyConds = ["-", ">", "<", "#", "-#"]
     const keywords = (keyword || "").split(/ /).filter((s) => s && emptyConds.indexOf(s) < 0)
 
     const condf = keywords.indexOf("@") < 0 ? () => false : (c) => !c
@@ -80,13 +80,26 @@ function buildFilters(keyword) {
     }
 
     const has_cand = keywords
-        .filter((s) => emptyConds.indexOf(s.substring(0, 1)) < 0)
+        .filter((s) => {
+            const c = s.substring(0, 1)
+            const ok = ["-", ">", "<"].indexOf(c) < 0
+            return ok
+        })
         .map((s) => s.toLowerCase())
+
     const starts = has_cand
         .filter((s) => s.substring(0, 1) === "^")
         .map((s) => s.substring(1))
         .filter((s) => s)
-    const has = has_cand.filter((s) => s.substring(0, 1) !== "^")
+
+    const tags = has_cand
+        .filter((s) => s.substring(0, 1) === "#")
+        .map((s) => s.substring(1))
+        .filter((s) => s)
+    const has = has_cand.filter((s) => {
+        const c = s.substring(0, 1)
+        return c !== "^" && c !== "#"
+    })
 
     const not_cand = keywords
         .filter((s) => s.startsWith("-"))
@@ -97,7 +110,31 @@ function buildFilters(keyword) {
         .filter((s) => s.substring(0, 1) === "^")
         .map((s) => s.substring(1))
         .filter((s) => s)
-    const not_has = not_cand.filter((s) => s.substring(0, 1) !== "^")
+
+    const not_tags = not_cand
+        .filter((s) => s.substring(0, 1) === "#")
+        .map((s) => s.substring(1))
+        .filter((s) => s)
+
+    const not_has = not_cand.filter((s) => {
+        const c = s.substring(0, 1)
+        return c !== "^" && c !== "#"
+    })
+
+    function tagf(tag) {
+        tag = (tag || "").toLowerCase()
+        for (let kw of tags) {
+            if (!tag.startsWith(kw)) {
+                return true
+            }
+        }
+        for (let kw of not_tags) {
+            if (tag.startsWith(kw)) {
+                return true
+            }
+        }
+        return false
+    }
 
     // log(`has:`, has, `starts:`, starts)
     // log(`not has:`, not_has, `not starts:`, not_starts)
@@ -139,6 +176,7 @@ function buildFilters(keyword) {
         sizef,
         condf,
         textf,
+        tagf,
     }
 }
 
