@@ -23,6 +23,10 @@ docker pull ghcr.nju.edu.cn/jjling2011/amule-m26:latest
 
 我觉得这些功能并不重要。
 
+### 开发指引
+
+[deploy.yml](.github/workflows/deploy.yml)
+
 ### 荣誉
 
 - https://github.com/ngosang/docker-amule/

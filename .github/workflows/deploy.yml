@@ -101,8 +101,8 @@ jobs:
       # 创建目标目录并下载 zip 包（供 Dockerfile 内部使用）
       - name: Download source for Docker Build
         run: |
-          curl -L "${AMULE_ARCHIVE}/${COMMIT_ID}.zip" -o /tmp/amule-proj.zip
-          unzip /tmp/amule-proj.zip -d /tmp/
+          curl -L "${AMULE_ARCHIVE}/${COMMIT_ID}.zip" -o /tmp/amule-org.zip
+          unzip /tmp/amule-org.zip -d /tmp/
           (cd "/tmp/amule-${COMMIT_ID}/" && zip -r "/tmp/amule-src.zip" .)
           mv /tmp/amule-src.zip ./docker/tmp/
 

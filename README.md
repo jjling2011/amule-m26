@@ -23,6 +23,10 @@ All configurations are the same as [ngosang/docker-amule](https://github.com/ngo
 
 I don't think these features are important.
 
+### Dev guide
+
+[deploy.yml](.github/workflows/deploy.yml)
+
 ### Credits
 
 - https://github.com/ngosang/docker-amule/
