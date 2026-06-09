@@ -156,7 +156,8 @@ https://github.com/jjling2011/amule-m26/
 Credits:
 https://github.com/ngosang/docker-amule/
 https://github.com/MatteoRagni/AmuleWebUI-Reloaded/
-https://github.com/amule-project/
+https://github.com/amule-org/amule/
+https://github.com/amule-project/amule/
 
 2026-06`,
     },

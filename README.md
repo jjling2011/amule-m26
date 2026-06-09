@@ -25,6 +25,7 @@ I don't think these features are important.
 
 ### Credits
 
-- https://github.com/ngosang/docker-amule
+- https://github.com/ngosang/docker-amule/
 - https://github.com/MatteoRagni/AmuleWebUI-Reloaded/
-- https://github.com/amule-project/amule
+- https://github.com/amule-org/amule/
+- https://github.com/amule-project/amule/

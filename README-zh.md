@@ -25,6 +25,7 @@ docker pull ghcr.nju.edu.cn/jjling2011/amule-m26:latest
 
 ### 荣誉
 
-- https://github.com/ngosang/docker-amule
+- https://github.com/ngosang/docker-amule/
 - https://github.com/MatteoRagni/AmuleWebUI-Reloaded/
-- https://github.com/amule-project/amule
+- https://github.com/amule-org/amule/
+- https://github.com/amule-project/amule/

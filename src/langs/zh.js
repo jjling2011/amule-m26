@@ -135,8 +135,8 @@ export default {
         stats: "Stats.",
         note: `过滤用法:
 hello    名称含 "hello"
--world   名称没有 "world"
-^hello   名称开头是 "hello"
+-hello   名称没有 "hello"
+^world   名称开头是 "world"
 -^world  名称开关不是 "world"
 #music   在 "music" 分类里面
 -#music  不在 "music" 分类里面
@@ -144,7 +144,7 @@ hello    名称含 "hello"
 >10      大于 10 MiB
 <200     小于 200 MiB
 
-过滤关键字使用空格分隔。
+多个过滤关键词使用空格分隔。
 
 
 提示:
@@ -156,7 +156,8 @@ https://github.com/jjling2011/amule-m26/
 Credits:
 https://github.com/ngosang/docker-amule/
 https://github.com/MatteoRagni/AmuleWebUI-Reloaded/
-https://github.com/amule-project/
+https://github.com/amule-org/amule/
+https://github.com/amule-project/amule/
 
 2026-06`,
     },
