@@ -236,7 +236,14 @@ onMounted(function () {
     margin: 0.5rem;
 }
 
-@media (max-width: 800px) {
+@media (max-height: 550) {
+    .nav-bar a {
+        margin-bottom: 0.25rem;
+        padding: 0.25rem 1rem;
+    }
+}
+
+@media (max-width: 1080px) {
     .side-bar {
         width: 2.5rem;
     }

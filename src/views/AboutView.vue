@@ -39,7 +39,7 @@ function goto(url) {
     font-size: 0.9rem;
 }
 
-@media (max-width: 800px) {
+@media (max-width: 1080px) {
     .toolbar,
     .table-header {
         left: 5rem;

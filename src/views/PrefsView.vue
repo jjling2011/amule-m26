@@ -309,7 +309,7 @@ onUnmounted(function () {
     padding: 0.25rem 0.5rem;
 }
 
-@media (max-width: 800px) {
+@media (max-width: 1080px) {
     .toolbar,
     .table-header {
         left: 5rem;

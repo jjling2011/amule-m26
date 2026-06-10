@@ -1,5 +1,5 @@
 <script setup>
-import { onMounted, onUnmounted, ref, computed } from "vue"
+import { onMounted, onUnmounted, ref, computed, watch } from "vue"
 import { useI18n } from "vue-i18n"
 import utils from "@/libs/utils.js"
 import efixer from "@/libs/encoding-fixer.js"
@@ -23,6 +23,14 @@ function onSelectAllChange() {
 const sortTag = compos.useLocalStorage("m26-search-sort-tag", "none")
 const sortOrder = compos.useLocalStorage("m26-search-sort-ordering", "descending")
 const filterKeyword = ref("")
+
+const rawFilterKeyword = ref("")
+const updateFilterKeyword = utils.debounce(function (kw) {
+    filterKeyword.value = kw
+})
+watch(rawFilterKeyword, (newValue) => {
+    updateFilterKeyword(newValue)
+})
 
 function getOrderSign(name) {
     if (name !== sortTag.value) {
@@ -194,14 +202,18 @@ onUnmounted(function () {
 <template>
     <div class="toolbar">
         <div class="toolstrip">
-            <i class="fa fa-sort-alpha-asc" aria-hidden="true"></i>
-            <select v-model="sortTag" class="select-sort-tag">
+            <i class="fa fa-sort-alpha-asc hide-w1080" aria-hidden="true"></i>
+            <select v-model="sortTag" class="select-sort-tag hide-w1080">
                 <option value="size">{{ t("search.size") }}</option>
                 <option value="sources">{{ t("search.sources") }}</option>
                 <option value="name_hr">{{ t("search.name") }}</option>
                 <option value="none">{{ t("search.none") }}</option>
             </select>
-            <select v-model="sortOrder" class="select-sort-direction" style="margin-right: 1rem">
+            <select
+                v-model="sortOrder"
+                class="select-sort-direction hide-w1080"
+                style="margin-right: 1rem"
+            >
                 <option value="ascending">{{ t("app.ascending") }}</option>
                 <option value="descending">{{ t("app.descending") }}</option>
             </select>
@@ -226,7 +238,7 @@ onUnmounted(function () {
                 <option v-for="(item, index) in cats" :value="index">{{ item }}</option>
             </select>
 
-            <input id="filter-input" v-model="filterKeyword" :placeholder="t('app.filter')" />
+            <input id="filter-input" v-model="rawFilterKeyword" :placeholder="t('app.filter')" />
         </div>
     </div>
     <div class="table-header">
@@ -334,18 +346,14 @@ onUnmounted(function () {
     margin-left: 1rem;
 }
 
-@media (max-width: 800px) {
+@media (max-width: 1080px) {
+    .hide-w1080 {
+        display: none;
+    }
+
     .toolbar,
     .table-header {
         left: 5rem;
-    }
-
-    .search-param {
-        display: none;
-    }
-
-    #filter-input {
-        display: none;
     }
 }
 </style>

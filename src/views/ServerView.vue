@@ -211,13 +211,13 @@ onUnmounted(function () {
 <template>
     <div class="toolbar">
         <div class="toolstrip">
-            <i class="fa fa-sort-alpha-asc minor-el" aria-hidden="true"></i>
-            <select v-model="sortTag" class="minor-el">
+            <i class="fa fa-sort-alpha-asc hide-w1080" aria-hidden="true"></i>
+            <select v-model="sortTag" class="hide-w1080">
                 <option value="name">{{ t("servers.name") }}</option>
                 <option value="users">{{ t("servers.users") }}</option>
                 <option value="files">{{ t("servers.files") }}</option>
             </select>
-            <select v-model="sortOrder" class="minor-el" style="margin-right: 1rem">
+            <select v-model="sortOrder" class="hide-w1080" style="margin-right: 1rem">
                 <option value="ascending">{{ t("app.ascending") }}</option>
                 <option value="descending">{{ t("app.descending") }}</option>
             </select>
@@ -333,13 +333,13 @@ onUnmounted(function () {
     padding: 0.125rem;
 }
 
-@media (max-width: 800px) {
+@media (max-width: 1080px) {
     .toolbar,
     .table-header {
         left: 5rem;
     }
 
-    .minor-el {
+    .hide-w1080 {
         display: none;
     }
 

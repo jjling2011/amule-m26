@@ -91,7 +91,7 @@ body {
     overflow-y: auto;
 }
 
-@media (max-width: 800px) {
+@media (max-width: 1080px) {
     .main-container {
         left: 5rem;
     }

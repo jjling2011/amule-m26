@@ -1,5 +1,5 @@
 <script setup>
-import { onMounted, onUnmounted, ref, computed } from "vue"
+import { onMounted, onUnmounted, ref, computed, watch } from "vue"
 import DropdownButton from "@/widgets/DropdownButton.vue"
 
 import { useI18n } from "vue-i18n"
@@ -55,6 +55,13 @@ function switchSortKeyTo(key) {
 }
 
 const filterKeyword = ref("")
+const rawFilterKeyword = ref("")
+const updateFilterKeyword = utils.debounce(function (kw) {
+    filterKeyword.value = kw
+})
+watch(rawFilterKeyword, (newValue) => {
+    updateFilterKeyword(newValue)
+})
 
 const sortedTasks = computed((prev) => {
     const trigger_recompute = triggerRef.value
@@ -207,8 +214,8 @@ onUnmounted(function () {
 <template>
     <div class="toolbar">
         <div class="toolstrip">
-            <i class="fa fa-sort-alpha-asc" aria-hidden="true"></i>
-            <select v-model="sortTag">
+            <i class="fa fa-sort-alpha-asc hide-w1080" aria-hidden="true"></i>
+            <select v-model="sortTag" class="hide-w1080">
                 <option value="name_hr">{{ t("download.name") }}</option>
                 <option value="cat_hr">{{ t("download.cat") }}</option>
                 <option value="size">{{ t("download.size") }}</option>
@@ -217,15 +224,14 @@ onUnmounted(function () {
                 <option value="prio">{{ t("download.prio") }}</option>
                 <option value="status">{{ t("download.status") }}</option>
             </select>
-            <select v-model="sortOrder" style="margin-right: 1rem">
+            <select v-model="sortOrder" style="margin-right: 1rem" class="hide-w1080">
                 <option value="ascending">{{ t("app.ascending") }}</option>
                 <option value="descending">{{ t("app.descending") }}</option>
             </select>
 
             <input
                 style="width: 10rem; margin-right: 1rem"
-                class="task-subtle-col"
-                v-model="filterKeyword"
+                v-model="rawFilterKeyword"
                 :placeholder="t('app.filter')"
             />
 
@@ -355,10 +361,14 @@ onUnmounted(function () {
     flex-direction: column;
 }
 
-@media (max-width: 800px) {
+@media (max-width: 1080px) {
     .toolbar,
     .table-header {
         left: 5rem;
+    }
+
+    .hide-w1080 {
+        display: none;
     }
 
     .task-subtle-col {

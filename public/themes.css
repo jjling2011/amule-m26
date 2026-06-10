@@ -54,6 +54,7 @@ select option {
 }
 
 button {
+    flex-shrink: 0;
     border: 1px solid gray;
     background-color: var(--btn-color);
     color: var(--fg-color);
