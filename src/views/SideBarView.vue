@@ -92,13 +92,13 @@ onMounted(function () {
                 <i class="fa fa-download" aria-hidden="true" :title="t('nav.download')"></i>
                 <span class="nav-text">{{ t("nav.download") }}</span>
             </RouterLink>
-            <RouterLink to="/server">
-                <i class="fa fa-server" aria-hidden="true" :title="t('nav.server')"></i>
-                <span class="nav-text">{{ t("nav.server") }}</span>
-            </RouterLink>
             <RouterLink to="/search">
                 <i class="fa fa-search" aria-hidden="true" :title="t('nav.search')"></i>
                 <span class="nav-text">{{ t("nav.search") }}</span>
+            </RouterLink>
+            <RouterLink to="/server">
+                <i class="fa fa-server" aria-hidden="true" :title="t('nav.server')"></i>
+                <span class="nav-text">{{ t("nav.server") }}</span>
             </RouterLink>
             <RouterLink to="/ed2k">
                 <i class="fa fa-link" aria-hidden="true" title="ED2K"></i>

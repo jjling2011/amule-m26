@@ -76,7 +76,12 @@ const sortedTasks = computed((prev) => {
         const name_hr = efixer.autoFixString(file.name)
         if (!filters.textf(name_hr)) {
             const t = transform(file, cur_selected, name_hr, cats)
-            if (!filters.condf(t.checked) && !filters.sizef(t.size) && !filters.tagf(t.cat_hr)) {
+            if (
+                !filters.condf(t.checked) &&
+                !filters.sizef(t.size) &&
+                !filters.tagf(t.cat_hr) &&
+                !filters.ratiof(t.complete)
+            ) {
                 r.push(t)
             }
         }
@@ -229,11 +234,12 @@ onUnmounted(function () {
                 <option value="descending">{{ t("app.descending") }}</option>
             </select>
 
-            <input
-                style="width: 10rem; margin-right: 1rem"
-                v-model="rawFilterKeyword"
-                :placeholder="t('app.filter')"
-            />
+            <button @click="setFileCatTo">
+                {{ t("download.move_to") }}
+            </button>
+            <select v-model="selectedCat" class="select-category" style="margin-right: 1rem">
+                <option v-for="(item, index) in tasks.cats" :value="index">{{ item }}</option>
+            </select>
 
             <DropdownButton
                 style="margin-right: 1rem"
@@ -242,12 +248,11 @@ onUnmounted(function () {
                 @action="handleTaskAction"
             />
 
-            <button @click="setFileCatTo">
-                {{ t("download.move_to") }}
-            </button>
-            <select v-model="selectedCat" class="select-category" style="margin-right: 1rem">
-                <option v-for="(item, index) in tasks.cats" :value="index">{{ item }}</option>
-            </select>
+            <input
+                style="width: 12rem; margin-right: 1rem"
+                v-model="rawFilterKeyword"
+                :placeholder="t('app.filter')"
+            />
         </div>
     </div>
     <div class="table-header">

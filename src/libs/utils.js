@@ -92,18 +92,37 @@ function buildFilters(keyword) {
 
     const condf = keywords.indexOf("@") < 0 ? () => false : (c) => !c
 
-    const min = Math.max(
-        ...keywords.filter((s) => s.startsWith(">")).map((s) => parseInt(s.substring(1)) || -1),
-    )
-    const max = Math.min(
+    const minSize = Math.max(
         ...keywords
-            .filter((s) => s.startsWith("<"))
+            .filter((s) => s.startsWith(">") && !s.endsWith("%"))
+            .map((s) => parseInt(s.substring(1)) || -1),
+    )
+
+    const maxSize = Math.min(
+        ...keywords
+            .filter((s) => s.startsWith("<") && !s.endsWith("%"))
             .map((s) => parseInt(s.substring(1)) || Number.MAX_SAFE_INTEGER),
     )
 
     function sizef(size) {
         size = size / 1024 / 1024
-        return size > max || size < min
+        return size > maxSize || size < minSize
+    }
+
+    const minRatio = Math.max(
+        ...keywords
+            .filter((s) => s.startsWith(">") && s.endsWith("%"))
+            .map((s) => parseInt(s.substring(1)) || -1),
+    )
+
+    const maxRatio = Math.min(
+        ...keywords
+            .filter((s) => s.startsWith("<") && s.endsWith("%"))
+            .map((s) => parseInt(s.substring(1)) || Number.MAX_SAFE_INTEGER),
+    )
+
+    function ratiof(percentage) {
+        return percentage > maxRatio || percentage < minRatio
     }
 
     const has_cand = keywords
@@ -201,6 +220,7 @@ function buildFilters(keyword) {
 
     return {
         sizef,
+        ratiof,
         condf,
         textf,
         tagf,

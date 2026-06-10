@@ -228,6 +228,7 @@ onUnmounted(function () {
                 v-model="searchKeyword"
                 @keydown.enter="doSearch()"
                 :placeholder="t('nav.search') + '<Enter>'"
+                style="width: 7rem"
             />
             <button @click="doSearch()" style="margin-right: 1rem">{{ t("nav.search") }}</button>
 
@@ -238,7 +239,12 @@ onUnmounted(function () {
                 <option v-for="(item, index) in cats" :value="index">{{ item }}</option>
             </select>
 
-            <input id="filter-input" v-model="rawFilterKeyword" :placeholder="t('app.filter')" />
+            <input
+                id="filter-input"
+                v-model="rawFilterKeyword"
+                :placeholder="t('app.filter')"
+                style="width: 12rem"
+            />
         </div>
     </div>
     <div class="table-header">

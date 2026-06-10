@@ -143,6 +143,8 @@ hello    include string "hello"
 {'@'}        selected
 >10      size bigger than 10 MiB
 <200     size smaller than 200 MiB
+>20%     download complete ratio more than 20%
+<80%     download complete ratio less than 80%
 
 Filter keywords are seperated by space.
 
