@@ -331,8 +331,8 @@ function formatBytes(input) {
     const i = Math.floor(Math.log(bytes) / Math.log(k))
 
     // 7. 格式化数值并拼接单位（保留两位小数，并去掉末尾多余的 0）
-    const formattedValue = parseFloat((bytes / Math.pow(k, i)).toFixed(1))
-    return `${formattedValue} ${units[i]}`
+    const val_hr = bytes / Math.pow(k, i)
+    return `${val_hr.toFixed(1)} ${units[i]}`
 }
 
 function subStrIn(needle, haystack) {

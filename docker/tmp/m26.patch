@@ -1,5 +1,5 @@
 diff --git a/src/webserver/src/WebServer.cpp b/src/webserver/src/WebServer.cpp
-index 046dd39ab..2591637a7 100644
+index 046dd39ab..c4995c48b 100644
 --- a/src/webserver/src/WebServer.cpp
 +++ b/src/webserver/src/WebServer.cpp
 @@ -440,6 +440,9 @@ void CWebServerBase::Send_DownloadFile_Cmd(wxString file_hash, wxString cmd, uin
@@ -12,36 +12,11 @@ index 046dd39ab..2591637a7 100644
  	}
  
  	if ( ec_cmd ) {
-@@ -496,6 +499,9 @@ void CWebServerBase::Send_Server_Cmd(uint32 ip, uint16 port, wxString cmd)
- void CWebServerBase::Send_Search_Cmd(wxString search, wxString extention, wxString type,
- 	EC_SEARCH_TYPE search_type, uint32 avail, uint32 min_size, uint32 max_size)
- {
-+	// m26: should clear last search result
-+	SearchFile::GetContainerInstance()->Clear();
-+
- 	CECPacket search_req(EC_OP_SEARCH_START);
- 	search_req.AddTag(CEC_Search_Tag (search, search_type,
- 		type, extention, avail, min_size, max_size));
-diff --git a/src/webserver/src/WebServer.h b/src/webserver/src/WebServer.h
-index ee7e94efe..f6c4961f0 100644
---- a/src/webserver/src/WebServer.h
-+++ b/src/webserver/src/WebServer.h
-@@ -444,6 +444,10 @@ class SearchInfo : public UpdatableItemsContainer<SearchFile, CEC_SearchFile_Tag
- 
- 		SearchInfo(CamulewebApp *webApp);
- 
-+		void Clear() {
-+			EraseAll();
-+		}
-+
- 		virtual bool ReQuery();
- 
- };
 diff --git a/src/webserver/src/WebSocket.cpp b/src/webserver/src/WebSocket.cpp
-index 62f0f6eb9..6e786557d 100644
+index f291be87e..87fcb09e0 100644
 --- a/src/webserver/src/WebSocket.cpp
 +++ b/src/webserver/src/WebSocket.cpp
-@@ -228,7 +228,7 @@ void CWebSocket::OnRequestReceived(char* pHeader, char* pData, uint32 dwDataLen)
+@@ -189,7 +189,7 @@ void CWebSocket::OnRequestReceived(char* pHeader, char* pData, uint32 dwDataLen)
  	}
  	*pHeader++ = 0;
  
@@ -50,7 +25,7 @@ index 62f0f6eb9..6e786557d 100644
  	// Capture the URL exactly as it was on the wire, before any
  	// POST-body concatenation below. The login handler in
  	// CScriptWebServer::ProcessURL needs to be able to distinguish
-@@ -246,7 +246,7 @@ void CWebSocket::OnRequestReceived(char* pHeader, char* pData, uint32 dwDataLen)
+@@ -207,7 +207,7 @@ void CWebSocket::OnRequestReceived(char* pHeader, char* pData, uint32 dwDataLen)
  		// truncates the first key's value to `b?pass=XYZ` and never
  		// registers a `pass` entry, breaking POST login on any URL
  		// that wasn't query-less (issue #724).
