@@ -305,9 +305,10 @@ onUnmounted(function () {
             <span style="width: 5rem; flex-shrink: 0; justify-content: end">{{
                 item.size_hr
             }}</span>
-            <span style="width: 5rem; flex-shrink: 0; justify-content: end">{{
-                item.complete_hr
-            }}</span>
+            <span
+                style="width: 5rem; flex-shrink: 0; justify-content: end; padding-right: 0.5rem"
+                >{{ item.complete_hr }}</span
+            >
             <span class="task-subtle-col mw1080-hide" style="justify-content: end">{{
                 item.speed_hr
             }}</span>

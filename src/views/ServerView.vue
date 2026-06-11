@@ -263,7 +263,7 @@ onUnmounted(function () {
             :key="index"
             :style="{ 'font-weight': isConnected(item.address) ? 'bold' : 'unset' }"
         >
-            <span style="width: 6rem">
+            <span style="width: 6rem; flex-shrink: 0">
                 <span v-if="isConnected(item.address)">
                     {{ t("servers.active") }}
                 </span>
@@ -280,10 +280,10 @@ onUnmounted(function () {
                 </div>
             </span>
             <span class="server-name-col">{{ item.name }}</span>
-            <span style="width: 6rem; text-align: right">{{ item.files }}</span>
-            <span style="width: 6rem; text-align: right">{{ item.users }}</span>
+            <span style="width: 6rem; text-align: right; flex-shrink: 0">{{ item.files }}</span>
+            <span style="width: 6rem; text-align: right; flex-shrink: 0">{{ item.users }}</span>
             <span
-                style="width: 10rem; text-align: right"
+                style="width: 10rem; text-align: right; flex-shrink: 0; padding-right: 0.5rem"
                 :data-ipv4="item.ip"
                 :data-port="item.port"
             >
@@ -301,6 +301,7 @@ onUnmounted(function () {
 <style scoped>
 .server-name-col {
     width: 15rem;
+    flex-shrink: 0;
 }
 
 .server-desc-col {
@@ -336,6 +337,7 @@ onUnmounted(function () {
 @media (max-width: 1080px) {
     .server-name-col {
         flex-grow: 1;
+        flex-shrink: 1;
     }
 
     .server-desc-col {
