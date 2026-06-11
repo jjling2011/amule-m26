@@ -7,7 +7,7 @@ import { setServAddr } from "@/libs/share-states.js"
 // 获取 i18n 的 t 函数和 locale 对象
 const { t } = useI18n()
 
-const stats = ref({ id: "" })
+const stats = ref({ id: 0xffffffff })
 
 function getSpeed() {
     const up = stats.value?.speed_up || 0
