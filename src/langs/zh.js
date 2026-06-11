@@ -137,7 +137,7 @@ export default {
 hello    名称含 "hello"
 -hello   名称没有 "hello"
 ^world   名称开头是 "world"
--^world  名称开关不是 "world"
+-^world  名称开头不是 "world"
 #music   在 "music" 分类里面
 -#music  不在 "music" 分类里面
 {'@'}        选中的
