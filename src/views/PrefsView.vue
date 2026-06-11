@@ -144,7 +144,7 @@ onUnmounted(function () {
 </script>
 
 <template>
-    <div class="toolbar">
+    <div class="toolbar mw1080-left">
         <div class="toolstrip">
             <button @click="applyPrefs" style="margin-right: 1rem">
                 <i class="fa fa-floppy-o" aria-hidden="true" style="color: var(--fg-color)"></i>
@@ -170,7 +170,7 @@ onUnmounted(function () {
             </div>
         </div>
     </div>
-    <div class="table-header">
+    <div class="table-header mw1080-left">
         <span style="width: 16rem">{{ t("prefs.key") }}</span>
         <span style="width: 10rem">{{ t("prefs.value") }}</span>
         <span style="flex-grow: 1; justify-content: start">{{ t("prefs.description") }}</span>
@@ -307,12 +307,5 @@ onUnmounted(function () {
     text-align: center;
     width: 8rem;
     padding: 0.25rem 0.5rem;
-}
-
-@media (max-width: 1080px) {
-    .toolbar,
-    .table-header {
-        left: 5rem;
-    }
 }
 </style>

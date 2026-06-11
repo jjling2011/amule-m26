@@ -56,12 +56,7 @@ function switchSortKeyTo(key) {
 
 const filterKeyword = ref("")
 const rawFilterKeyword = ref("")
-const updateFilterKeyword = utils.debounce(function (kw) {
-    filterKeyword.value = kw
-})
-watch(rawFilterKeyword, (newValue) => {
-    updateFilterKeyword(newValue)
-})
+compos.debounceRef(rawFilterKeyword, filterKeyword)
 
 const sortedTasks = computed((prev) => {
     const trigger_recompute = triggerRef.value
@@ -217,10 +212,10 @@ onUnmounted(function () {
 </script>
 
 <template>
-    <div class="toolbar">
+    <div class="toolbar mw1080-left">
         <div class="toolstrip">
-            <i class="fa fa-sort-alpha-asc hide-w1080" aria-hidden="true"></i>
-            <select v-model="sortTag" class="hide-w1080">
+            <i class="fa fa-sort-alpha-asc mw1080-hide" aria-hidden="true"></i>
+            <select v-model="sortTag" class="mw1080-hide">
                 <option value="name_hr">{{ t("download.name") }}</option>
                 <option value="cat_hr">{{ t("download.cat") }}</option>
                 <option value="size">{{ t("download.size") }}</option>
@@ -229,7 +224,7 @@ onUnmounted(function () {
                 <option value="prio">{{ t("download.prio") }}</option>
                 <option value="status">{{ t("download.status") }}</option>
             </select>
-            <select v-model="sortOrder" style="margin-right: 1rem" class="hide-w1080">
+            <select v-model="sortOrder" style="margin-right: 1rem" class="mw1080-hide">
                 <option value="ascending">{{ t("app.ascending") }}</option>
                 <option value="descending">{{ t("app.descending") }}</option>
             </select>
@@ -255,7 +250,7 @@ onUnmounted(function () {
             />
         </div>
     </div>
-    <div class="table-header">
+    <div class="table-header mw1080-left">
         <span style="width: 3rem">
             <input type="checkbox" v-model="selectAll" @change="onSelectAllChange" />
         </span>
@@ -272,13 +267,13 @@ onUnmounted(function () {
         <span style="width: 5rem; cursor: pointer" @click="switchSortKeyTo('complete')"
             >{{ t("download.complete") }}{{ getOrderSign("complete") }}</span
         >
-        <span class="task-subtle-col" @click="switchSortKeyTo('speed')"
+        <span class="task-subtle-col mw1080-hide" @click="switchSortKeyTo('speed')"
             >{{ t("download.speed") }}{{ getOrderSign("speed") }}</span
         >
-        <span class="task-subtle-col" @click="switchSortKeyTo('prio')"
+        <span class="task-subtle-col mw1080-hide" @click="switchSortKeyTo('prio')"
             >{{ t("download.prio") }}{{ getOrderSign("prio") }}</span
         >
-        <span class="task-subtle-col" @click="switchSortKeyTo('status')"
+        <span class="task-subtle-col mw1080-hide" @click="switchSortKeyTo('status')"
             >{{ t("download.status") }}{{ getOrderSign("status") }}</span
         >
     </div>
@@ -313,9 +308,11 @@ onUnmounted(function () {
             <span style="width: 5rem; flex-shrink: 0; justify-content: end">{{
                 item.complete_hr
             }}</span>
-            <span class="task-subtle-col" style="justify-content: end">{{ item.speed_hr }}</span>
-            <span class="task-subtle-col">{{ item.prio }}</span>
-            <span class="task-subtle-col">{{ item.status }}</span>
+            <span class="task-subtle-col mw1080-hide" style="justify-content: end">{{
+                item.speed_hr
+            }}</span>
+            <span class="task-subtle-col mw1080-hide">{{ item.prio }}</span>
+            <span class="task-subtle-col mw1080-hide">{{ item.status }}</span>
         </div>
 
         <div style="width: 100%; height: 3rem"><!-- place holder --></div>
@@ -364,20 +361,5 @@ onUnmounted(function () {
 .container {
     display: flex;
     flex-direction: column;
-}
-
-@media (max-width: 1080px) {
-    .toolbar,
-    .table-header {
-        left: 5rem;
-    }
-
-    .hide-w1080 {
-        display: none;
-    }
-
-    .task-subtle-col {
-        display: none !important;
-    }
 }
 </style>

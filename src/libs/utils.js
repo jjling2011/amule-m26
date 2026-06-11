@@ -15,38 +15,11 @@ function reloadPage() {
     window.location.href = window.location.href
 }
 
-/**
- * 防抖辅助函数
- * @param {Function} func - 需要进行防抖处理的目标函数
- * @param {number} delay - 延迟时间（毫秒），默认 300ms
- * @returns {Function} - 返回一个新的防抖化后的函数
- */
-function debounce(func, delay = 300) {
-    let timer = null
-
-    // 返回的这个函数就是用户实际调用的高频事件处理函数
-    return function (...args) {
-        // 保存当前上下文，确保原函数的 this 指向正确（例如在 DOM 事件中指向触发元素）
-        const context = this
-
-        // 如果在延迟时间内再次触发，清除上一次的定时器，重新开始计时
-        if (timer) {
-            clearTimeout(timer)
-        }
-
-        // 设置新的定时器
-        timer = setTimeout(() => {
-            // 延迟时间到了，执行目标函数，并传入正确的 this 和参数
-            func.apply(context, args)
-        }, delay)
-    }
-}
-
 // to-do: add task queue
 function query(data, url, timeout, method) {
     url = url || "./serv.php"
     method = method || (isDevEnv() ? "GET" : "POST")
-    timeout = timeout || 8000
+    timeout = timeout || 12000
     data = data || {}
 
     function ondata(resolve, reject, response) {
@@ -112,17 +85,17 @@ function buildFilters(keyword) {
     const minRatio = Math.max(
         ...keywords
             .filter((s) => s.startsWith(">") && s.endsWith("%"))
-            .map((s) => parseInt(s.substring(1)) || -1),
+            .map((s) => parseFloat(s.substring(1)) || -1),
     )
 
     const maxRatio = Math.min(
         ...keywords
             .filter((s) => s.startsWith("<") && s.endsWith("%"))
-            .map((s) => parseInt(s.substring(1)) || Number.MAX_SAFE_INTEGER),
+            .map((s) => parseFloat(s.substring(1)) || Number.MAX_SAFE_INTEGER),
     )
 
     function ratiof(percentage) {
-        return percentage > maxRatio || percentage < minRatio
+        return percentage > maxRatio || percentage < minRatio - 0.001
     }
 
     const has_cand = keywords
@@ -501,7 +474,6 @@ export default {
     uniqueByKey,
     copyToClipboard,
     flattenObject,
-    debounce,
 
     getCurThemeMode,
     switchTheme,

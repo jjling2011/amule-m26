@@ -65,7 +65,7 @@ onUnmounted(() => {
 <template>
     <div class="app-container">
         <SideBar @on-app-name-click="scrollMainContainer(true)" />
-        <div ref="scrollableContainer" class="main-container">
+        <div ref="scrollableContainer" class="main-container mw1080-left">
             <RouterView />
         </div>
     </div>
@@ -89,11 +89,5 @@ body {
     /* padding: 1rem; */
     left: 14rem;
     overflow-y: auto;
-}
-
-@media (max-width: 1080px) {
-    .main-container {
-        left: 5rem;
-    }
 }
 </style>

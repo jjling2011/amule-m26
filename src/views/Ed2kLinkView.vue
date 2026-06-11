@@ -68,7 +68,7 @@ onUnmounted(function () {
 </script>
 
 <template>
-    <div class="toolbar">
+    <div class="toolbar mw1080-left">
         <div class="toolstrip">
             <button @click="downloadEd2kLinks" :disabled="btnDownloadDisabled">
                 {{ t("search.download_to") }}
@@ -78,7 +78,7 @@ onUnmounted(function () {
             </select>
         </div>
     </div>
-    <div class="table-header">
+    <div class="table-header mw1080-left">
         <span style="flex-grow: 1">{{ t("ed2k.links") }} ({{ countLinks() }})</span>
     </div>
     <div class="container">
@@ -101,12 +101,5 @@ onUnmounted(function () {
     width: 100%;
     margin-top: 1rem;
     padding: 0.5rem 1rem;
-}
-
-@media (max-width: 1080px) {
-    .toolbar,
-    .table-header {
-        left: 5rem;
-    }
 }
 </style>

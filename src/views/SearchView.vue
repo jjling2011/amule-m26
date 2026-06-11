@@ -22,15 +22,10 @@ function onSelectAllChange() {
 //#region computed
 const sortTag = compos.useLocalStorage("m26-search-sort-tag", "none")
 const sortOrder = compos.useLocalStorage("m26-search-sort-ordering", "descending")
-const filterKeyword = ref("")
 
+const filterKeyword = ref("")
 const rawFilterKeyword = ref("")
-const updateFilterKeyword = utils.debounce(function (kw) {
-    filterKeyword.value = kw
-})
-watch(rawFilterKeyword, (newValue) => {
-    updateFilterKeyword(newValue)
-})
+compos.debounceRef(rawFilterKeyword, filterKeyword)
 
 function getOrderSign(name) {
     if (name !== sortTag.value) {
@@ -200,10 +195,10 @@ onUnmounted(function () {
 </script>
 
 <template>
-    <div class="toolbar">
+    <div class="toolbar mw1080-left">
         <div class="toolstrip">
-            <i class="fa fa-sort-alpha-asc hide-w1080" aria-hidden="true"></i>
-            <select v-model="sortTag" class="select-sort-tag hide-w1080">
+            <i class="fa fa-sort-alpha-asc mw1080-hide" aria-hidden="true"></i>
+            <select v-model="sortTag" class="select-sort-tag mw1080-hide">
                 <option value="size">{{ t("search.size") }}</option>
                 <option value="sources">{{ t("search.sources") }}</option>
                 <option value="name_hr">{{ t("search.name") }}</option>
@@ -211,7 +206,7 @@ onUnmounted(function () {
             </select>
             <select
                 v-model="sortOrder"
-                class="select-sort-direction hide-w1080"
+                class="select-sort-direction mw1080-hide"
                 style="margin-right: 1rem"
             >
                 <option value="ascending">{{ t("app.ascending") }}</option>
@@ -247,7 +242,7 @@ onUnmounted(function () {
             />
         </div>
     </div>
-    <div class="table-header">
+    <div class="table-header mw1080-left">
         <span style="width: 3rem">
             <input type="checkbox" v-model="selectAll" @change="onSelectAllChange" />
         </span>
@@ -350,16 +345,5 @@ onUnmounted(function () {
     flex-shrink: 0;
     margin: 0.125rem 0.5rem;
     margin-left: 1rem;
-}
-
-@media (max-width: 1080px) {
-    .hide-w1080 {
-        display: none;
-    }
-
-    .toolbar,
-    .table-header {
-        left: 5rem;
-    }
 }
 </style>

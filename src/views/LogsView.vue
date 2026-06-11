@@ -74,7 +74,7 @@ onUnmounted(function () {
 </script>
 
 <template>
-    <div class="toolbar">
+    <div class="toolbar mw1080-left">
         <div class="toolstrip">
             <span>{{ t("logs.cat") }}</span>
             <select v-model="logType" style="margin-right: 1rem">
@@ -91,7 +91,7 @@ onUnmounted(function () {
             </label>
         </div>
     </div>
-    <div class="table-header">
+    <div class="table-header mw1080-left">
         <span style="flex-grow: 1">{{ logType }}</span>
     </div>
     <div class="container">
@@ -119,12 +119,5 @@ onUnmounted(function () {
     width: 100%;
     margin-top: 1rem;
     padding: 0.5rem 1rem;
-}
-
-@media (max-width: 1080px) {
-    .toolbar,
-    .table-header {
-        left: 5rem;
-    }
 }
 </style>

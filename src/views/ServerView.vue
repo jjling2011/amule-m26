@@ -209,15 +209,15 @@ onUnmounted(function () {
 </script>
 
 <template>
-    <div class="toolbar">
+    <div class="toolbar mw1080-left">
         <div class="toolstrip">
-            <i class="fa fa-sort-alpha-asc hide-w1080" aria-hidden="true"></i>
-            <select v-model="sortTag" class="hide-w1080">
+            <i class="fa fa-sort-alpha-asc mw1080-hide" aria-hidden="true"></i>
+            <select v-model="sortTag" class="mw1080-hide">
                 <option value="name">{{ t("servers.name") }}</option>
                 <option value="users">{{ t("servers.users") }}</option>
                 <option value="files">{{ t("servers.files") }}</option>
             </select>
-            <select v-model="sortOrder" class="hide-w1080" style="margin-right: 1rem">
+            <select v-model="sortOrder" class="mw1080-hide" style="margin-right: 1rem">
                 <option value="ascending">{{ t("app.ascending") }}</option>
                 <option value="descending">{{ t("app.descending") }}</option>
             </select>
@@ -240,7 +240,7 @@ onUnmounted(function () {
             </button>
         </div>
     </div>
-    <div class="table-header">
+    <div class="table-header mw1080-left">
         <span style="width: 6rem">{{ t("servers.action") }}</span>
         <span class="server-name-col" style="cursor: pointer" @click="switchSortKeyTo('name')"
             >{{ t("servers.name") }}{{ getOrderSign("name") }}</span
@@ -334,15 +334,6 @@ onUnmounted(function () {
 }
 
 @media (max-width: 1080px) {
-    .toolbar,
-    .table-header {
-        left: 5rem;
-    }
-
-    .hide-w1080 {
-        display: none;
-    }
-
     .server-name-col {
         flex-grow: 1;
     }

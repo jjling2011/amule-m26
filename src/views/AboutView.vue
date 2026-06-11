@@ -11,13 +11,13 @@ function goto(url) {
 </script>
 
 <template>
-    <div class="toolbar">
+    <div class="toolbar mw1080-left">
         <div class="toolstrip">
             <button @click="goto(githubUrl)" :title="githubUrl">GitHub</button>
             <button @click="goto(dockerUrl)" :title="dockerUrl">Docker</button>
         </div>
     </div>
-    <div class="table-header">
+    <div class="table-header mw1080-left">
         <!-- pass -->
     </div>
     <div class="container">
@@ -37,12 +37,5 @@ function goto(url) {
 .about-content {
     padding: 1rem;
     font-size: 0.9rem;
-}
-
-@media (max-width: 1080px) {
-    .toolbar,
-    .table-header {
-        left: 5rem;
-    }
 }
 </style>
