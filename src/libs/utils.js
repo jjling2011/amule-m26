@@ -15,8 +15,28 @@ function reloadPage() {
     window.location.href = window.location.href
 }
 
-// to-do: add task queue
+let queryQueue = Promise.resolve()
+/**
+ * 暴露给外部的 query 函数（调用方式完全不变）
+ * 通过推入队列实现并发变串行
+ */
 function query(data, url, timeout, method) {
+    // 1. 将当前的请求注册到队列中，等待之前的请求全部完成
+    const currentTask = queryQueue.then(() => {
+        return queryCore(data, url, timeout, method)
+    })
+
+    // 2. 更新队列尾指针
+    // 无论当前请求是成功（resolve）还是失败（reject），都必须释放队列，允许下一个请求执行
+    queryQueue = currentTask.catch(() => {
+        // 捕获异常，防止某一个请求失败导致后续整个队列被阻塞
+    })
+
+    // 3. 返回当前任务的 Promise，确保外部的 .then() 或 await 能正确拿到结果/捕获错误
+    return currentTask
+}
+
+function queryCore(data, url, timeout, method) {
     url = url || "./serv.php"
     method = method || (isDevEnv() ? "GET" : "POST")
     timeout = timeout || 12000
