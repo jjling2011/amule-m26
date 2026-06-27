@@ -35,10 +35,10 @@ index ce7c36c76..64436bcee 100644
  	}
  
 diff --git a/src/webserver/src/php_amule_lib.cpp b/src/webserver/src/php_amule_lib.cpp
-index e03828863..a48a03a2d 100644
+index e03828863..eab45d876 100644
 --- a/src/webserver/src/php_amule_lib.cpp
 +++ b/src/webserver/src/php_amule_lib.cpp
-@@ -411,6 +411,18 @@ PHP_2_EC_OPT_DEF g_webserver_opt_defs[] = { { "use_gzip", EC_TAG_WEBSERVER_USEGZ
+@@ -411,6 +411,12 @@ PHP_2_EC_OPT_DEF g_webserver_opt_defs[] = { { "use_gzip", EC_TAG_WEBSERVER_USEGZ
  PHP_2_EC_OPT_DEF g_coretweak_opt_defs[] = { { "max_conn_5sec", EC_TAG_CORETW_MAX_CONN_PER_FIVE, 2 },
  	{ 0, (ECTagNames)0, 0 } };
  
@@ -48,16 +48,10 @@ index e03828863..a48a03a2d 100644
 +	{0, (ECTagNames)0, 0}
 +};
 +
-+PHP_2_EC_OPT_DEF g_servers_opt_defs[] = {
-+	{ "add_from_server", EC_TAG_SERVERS_ADD_FROM_SERVER, 0},
-+	{ "add_from_client", EC_TAG_SERVERS_ADD_FROM_CLIENT, 0},
-+	{0, (ECTagNames)0, 0}
-+};
-+
  void set_array_int_val(PHP_VALUE_NODE *array, const std::string &arrkey, int value)
  {
  	PHP_VAR_NODE *key = array_get_by_str_key(array, arrkey);
-@@ -484,6 +496,13 @@ void php_get_amule_options(PHP_VALUE_NODE *result)
+@@ -484,6 +490,13 @@ void php_get_amule_options(PHP_VALUE_NODE *result)
  		ec_tag_2_php(cattag, g_file_opt_defs, cat);
  	}
  
@@ -71,7 +65,7 @@ index e03828863..a48a03a2d 100644
  	if ((cattag = reply->GetTagByName(EC_TAG_PREFS_REMOTECTRL)) != 0) {
  		PHP_VAR_NODE *cat = array_get_by_str_key(result, "webserver");
  		cast_value_array(&cat->value);
-@@ -563,6 +582,14 @@ void php_set_amule_options(PHP_VALUE_NODE *)
+@@ -563,6 +576,14 @@ void php_set_amule_options(PHP_VALUE_NODE *)
  		php_2_ec_tag(&connPrefs, g_connection_opt_defs, &opt_group_array->value);
  		req.AddTag(connPrefs);
  	}

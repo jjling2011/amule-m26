@@ -1,4 +1,4 @@
-#### v0.1.7
+#### v0.1.8
 
 - process AJAX requests in sequence using a queue
 - update to amule v3.0.1
