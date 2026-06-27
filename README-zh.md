@@ -14,7 +14,7 @@ docker pull ghcr.nju.edu.cn/jjling2011/amule-m26:latest
 
 ### 界面
 
-![dark-theme-search.png](docs/search-dark.png)
+![light-theme-search.png](docs/search-light.png)
 
 ### 缺失的功能
 

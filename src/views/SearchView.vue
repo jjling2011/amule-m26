@@ -247,7 +247,7 @@ onUnmounted(function () {
             <input type="checkbox" v-model="selectAll" @change="onSelectAllChange" />
         </span>
         <span
-            style="width: 4rem; flex-shrink: 0; text-align: right; cursor: pointer"
+            style="width: 5rem; flex-shrink: 0; text-align: right; cursor: pointer"
             @click="switchSortKeyTo('sources')"
             >{{ t("search.sources") }}{{ getOrderSign("sources") }}</span
         >
@@ -275,7 +275,7 @@ onUnmounted(function () {
                     :disabled="item.downloading"
                 />
 
-                <span style="width: 4rem; text-align: center; flex-shrink: 0">{{
+                <span style="width: 5rem; text-align: center; flex-shrink: 0">{{
                     item.sources
                 }}</span>
                 <span style="width: 5rem; text-align: right; flex-shrink: 0">{{

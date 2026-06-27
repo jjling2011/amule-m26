@@ -1,8 +1,8 @@
 diff --git a/src/webserver/src/WebServer.cpp b/src/webserver/src/WebServer.cpp
-index ff2a38740..d6895a1a1 100644
+index 00850ad3e..30d9166ea 100644
 --- a/src/webserver/src/WebServer.cpp
 +++ b/src/webserver/src/WebServer.cpp
-@@ -440,6 +440,9 @@ void CWebServerBase::Send_DownloadFile_Cmd(wxString file_hash, wxString cmd, uin
+@@ -465,6 +465,9 @@ void CWebServerBase::Send_DownloadFile_Cmd(wxString file_hash, wxString cmd, uin
  			hashtag.AddTag(CECTag(EC_TAG_PARTFILE_PRIO,
  				GetLowerPrio(file->lFilePrio, file->bFileAutoPriority)));
  		}
@@ -11,12 +11,12 @@ index ff2a38740..d6895a1a1 100644
 +		hashtag.AddTag(CECTag(EC_TAG_PARTFILE_CAT, (uint8)opt_arg));
  	}
  
- 	if ( ec_cmd ) {
+ 	if (ec_cmd) {
 diff --git a/src/webserver/src/WebSocket.cpp b/src/webserver/src/WebSocket.cpp
-index 62f0f6eb9..6e786557d 100644
+index ce7c36c76..64436bcee 100644
 --- a/src/webserver/src/WebSocket.cpp
 +++ b/src/webserver/src/WebSocket.cpp
-@@ -228,7 +228,7 @@ void CWebSocket::OnRequestReceived(char* pHeader, char* pData, uint32 dwDataLen)
+@@ -226,7 +226,7 @@ void CWebSocket::OnRequestReceived(char *pHeader, char *pData, uint32 dwDataLen)
  	}
  	*pHeader++ = 0;
  
@@ -25,7 +25,7 @@ index 62f0f6eb9..6e786557d 100644
  	// Capture the URL exactly as it was on the wire, before any
  	// POST-body concatenation below. The login handler in
  	// CScriptWebServer::ProcessURL needs to be able to distinguish
-@@ -246,7 +246,7 @@ void CWebSocket::OnRequestReceived(char* pHeader, char* pData, uint32 dwDataLen)
+@@ -244,7 +244,7 @@ void CWebSocket::OnRequestReceived(char *pHeader, char *pData, uint32 dwDataLen)
  		// truncates the first key's value to `b?pass=XYZ` and never
  		// registers a `pass` entry, breaking POST login on any URL
  		// that wasn't query-less (issue #724).
@@ -35,13 +35,19 @@ index 62f0f6eb9..6e786557d 100644
  	}
  
 diff --git a/src/webserver/src/php_amule_lib.cpp b/src/webserver/src/php_amule_lib.cpp
-index acc06f880..8959217f2 100644
+index e03828863..a48a03a2d 100644
 --- a/src/webserver/src/php_amule_lib.cpp
 +++ b/src/webserver/src/php_amule_lib.cpp
-@@ -415,6 +415,12 @@ PHP_2_EC_OPT_DEF g_coretweak_opt_defs[] = {
- 	{0, (ECTagNames)0, 0}
- };
+@@ -411,6 +411,18 @@ PHP_2_EC_OPT_DEF g_webserver_opt_defs[] = { { "use_gzip", EC_TAG_WEBSERVER_USEGZ
+ PHP_2_EC_OPT_DEF g_coretweak_opt_defs[] = { { "max_conn_5sec", EC_TAG_CORETW_MAX_CONN_PER_FIVE, 2 },
+ 	{ 0, (ECTagNames)0, 0 } };
  
++PHP_2_EC_OPT_DEF g_servers_opt_defs[] = {
++	{ "add_from_server", EC_TAG_SERVERS_ADD_FROM_SERVER, 0},
++	{ "add_from_client", EC_TAG_SERVERS_ADD_FROM_CLIENT, 0},
++	{0, (ECTagNames)0, 0}
++};
++
 +PHP_2_EC_OPT_DEF g_servers_opt_defs[] = {
 +	{ "add_from_server", EC_TAG_SERVERS_ADD_FROM_SERVER, 0},
 +	{ "add_from_client", EC_TAG_SERVERS_ADD_FROM_CLIENT, 0},
@@ -51,7 +57,7 @@ index acc06f880..8959217f2 100644
  void set_array_int_val(PHP_VALUE_NODE *array, const std::string &arrkey, int value)
  {
  	PHP_VAR_NODE *key = array_get_by_str_key(array, arrkey);
-@@ -477,6 +483,13 @@ void php_get_amule_options(PHP_VALUE_NODE *result)
+@@ -484,6 +496,13 @@ void php_get_amule_options(PHP_VALUE_NODE *result)
  		ec_tag_2_php(cattag, g_file_opt_defs, cat);
  	}
  
@@ -65,7 +71,7 @@ index acc06f880..8959217f2 100644
  	if ((cattag = reply->GetTagByName(EC_TAG_PREFS_REMOTECTRL)) != 0) {
  		PHP_VAR_NODE *cat = array_get_by_str_key(result, "webserver");
  		cast_value_array(&cat->value);
-@@ -550,6 +563,14 @@ void php_set_amule_options(PHP_VALUE_NODE *)
+@@ -563,6 +582,14 @@ void php_set_amule_options(PHP_VALUE_NODE *)
  		php_2_ec_tag(&connPrefs, g_connection_opt_defs, &opt_group_array->value);
  		req.AddTag(connPrefs);
  	}
@@ -79,12 +85,12 @@ index acc06f880..8959217f2 100644
 +
  	// webserver
  	opt_group_array = array_get_by_str_key(&si->var->value, "webserver");
- 	if ( opt_group_array->value.type == PHP_VAL_ARRAY ) {
+ 	if (opt_group_array->value.type == PHP_VAL_ARRAY) {
 diff --git a/src/webserver/src/php_core_lib.cpp b/src/webserver/src/php_core_lib.cpp
-index 7a6456588..466e49e20 100644
+index cf9104277..36bdd1efb 100644
 --- a/src/webserver/src/php_core_lib.cpp
 +++ b/src/webserver/src/php_core_lib.cpp
-@@ -453,7 +453,313 @@ void php_native_ngettext(PHP_VALUE_NODE *result)
+@@ -545,7 +545,313 @@ void php_native_ngettext(PHP_VALUE_NODE *result)
  }
  #endif
  

@@ -14,7 +14,7 @@ All configurations are the same as [ngosang/docker-amule](https://github.com/ngo
 
 ### Screen shot
 
-![dark-theme-search.png](docs/search-dark.png)
+![light-theme-search.png](docs/search-light.png)
 
 ### Missing features
 
