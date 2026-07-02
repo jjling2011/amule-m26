@@ -1,3 +1,7 @@
+#### v0.1.9
+
+- translate sidebar status tags
+
 #### v0.1.8
 
 - process AJAX requests in sequence using a queue

@@ -18,6 +18,8 @@ export default {
         prefs: "Preference",
         logs: "Logs",
         about: "About",
+        speed: "Speed",
+        speed_tip: "upload, download",
     },
     dialogs: {
         ok: "Ok",

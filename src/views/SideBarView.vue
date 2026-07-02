@@ -39,7 +39,7 @@ function getKadStats() {
     if (!s || !s.kad_connected) {
         return "Offline!"
     }
-    return s.kad_firewalled ? "firewalled" : "Connected"
+    return s.kad_firewalled ? "Firewalled" : "Connected"
 }
 
 let handle = null
@@ -118,8 +118,8 @@ onMounted(function () {
             </RouterLink>
         </nav>
         <div class="serv-stats">
-            <span>Speed:</span>
-            <span title="upload, download">{{ getSpeed() }}</span>
+            <span>{{ t("nav.speed") }}:</span>
+            <span :title="t('nav.speed_tip')">{{ getSpeed() }}</span>
         </div>
         <div class="serv-stats">
             <span>UID:</span>
@@ -130,7 +130,7 @@ onMounted(function () {
             <span>{{ getKadStats() }}</span>
         </div>
         <div class="serv-stats" style="margin-bottom: 1rem">
-            <span>Server:</span>
+            <span>{{ t("nav.server") }}:</span>
             <span :title="getServStats()">{{ getServStats() }}</span>
         </div>
     </div>

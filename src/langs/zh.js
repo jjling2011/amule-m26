@@ -18,6 +18,8 @@ export default {
         prefs: "选项",
         logs: "日志",
         about: "关于",
+        speed: "速度",
+        speed_tip: "上传，下载",
     },
     dialogs: {
         ok: "确定",
